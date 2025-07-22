@@ -2,27 +2,38 @@ package com.proyecto.modismos
 
 import android.content.Intent
 import android.os.Bundle
+import android.widget.Button
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.view.WindowCompat
-import kotlinx.coroutines.*
 
-class MainActivity : AppCompatActivity() {
-
-    private val splashDelay = 2000L  // 2 segundos
+class WelcomeActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         supportActionBar?.hide()
-        setContentView(R.layout.activity_main)
+        setContentView(R.layout.activity_welcome)
 
         setupTransparentBars()
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
 
-        // Inicia el splash y redirige después de 2 segundos
-        CoroutineScope(Dispatchers.Main).launch {
-            delay(splashDelay)
-            goToNextScreen()
+        // Obtener referencias a los botones
+        val loginButton = findViewById<Button>(R.id.loginButton)
+        val signupLink = findViewById<TextView>(R.id.signupLink)
+
+        // Redirigir a la pantalla de login
+        loginButton.setOnClickListener {
+            val intent = Intent(this, LoginActivity::class.java)
+            startActivity(intent)
         }
+
+        // Redirigir a la pantalla de crear cuenta
+        /*signupLink.setOnClickListener {
+            val intent = Intent(this, RegisterActivity::class.java)
+            startActivity(intent)
+        }*/
     }
 
     private fun setupTransparentBars() {
@@ -36,13 +47,5 @@ class MainActivity : AppCompatActivity() {
 
         insetsController.isAppearanceLightStatusBars = !isNightMode
         insetsController.isAppearanceLightNavigationBars = !isNightMode
-    }
-
-    private fun goToNextScreen() {
-        // verificar si la sesión está activa o no
-
-        val intent = Intent(this, WelcomeActivity::class.java)
-        startActivity(intent)
-        finish()
     }
 }

@@ -1,28 +1,18 @@
 package com.proyecto.modismos
 
-import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.view.WindowCompat
-import kotlinx.coroutines.*
 
-class MainActivity : AppCompatActivity() {
-
-    private val splashDelay = 2000L  // 2 segundos
-
+class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        setContentView(R.layout.activity_login)
         supportActionBar?.hide()
-        setContentView(R.layout.activity_main)
 
         setupTransparentBars()
-
-        // Inicia el splash y redirige después de 2 segundos
-        CoroutineScope(Dispatchers.Main).launch {
-            delay(splashDelay)
-            goToNextScreen()
-        }
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
     }
 
     private fun setupTransparentBars() {
@@ -36,13 +26,5 @@ class MainActivity : AppCompatActivity() {
 
         insetsController.isAppearanceLightStatusBars = !isNightMode
         insetsController.isAppearanceLightNavigationBars = !isNightMode
-    }
-
-    private fun goToNextScreen() {
-        // verificar si la sesión está activa o no
-
-        val intent = Intent(this, WelcomeActivity::class.java)
-        startActivity(intent)
-        finish()
     }
 }

@@ -1,7 +1,42 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Base.Theme.Modistra" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your dark theme here. -->
-        <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
+<?xml version="1.0" encoding="utf-8"?>
+<!-- res/values-night/styles.xml -->
+<resources>
+    <!-- Tema modo oscuro con barras transparentes -->
+    <style name="AppTheme" parent="Theme.MaterialComponents.DayNight">
+        <!-- Colores principales -->
+        <item name="colorPrimary">@color/red_primary</item>
+        <item name="colorPrimaryVariant">@color/red_primary_dark</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="android:editTextColor">@color/gray_dark</item>
+        <item name="textAppearanceBody1">@color/text_white</item>
+
+        <!-- Colores de superficie -->
+        <item name="colorSurface">@color/black_secondary</item>
+        <item name="colorOnSurface">@color/black_secondary</item>
+        <item name="colorOnBackground">@color/black</item>
+
+        <!-- Status bar transparente -->
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">false</item>
+
+        <!-- Navigation bar transparente -->
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowLightNavigationBar">false</item>
+
+        <!-- Configuración para pantalla completa -->
+        <item name="android:windowTranslucentStatus">false</item>
+        <item name="android:windowTranslucentNavigation">false</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+
+        <!-- FitsSystemWindows para manejar el padding correctamente -->
+        <item name="android:fitsSystemWindows">false</item>
+    </style>
+
+    <!-- Tema para Splash Screen modo oscuro con barras transparentes -->
+    <style name="SplashTheme" parent="AppTheme">
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowLightNavigationBar">false</item>
     </style>
 </resources>

@@ -1,5 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- res/values/colors.xml -->
 <resources>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
+    <!-- Colores principales basados en tu diseño -->
+    <color name="red_primary">#C00F0C</color>
+    <color name="red_primary_dark">#B00505</color>
+    <color name="red_primary_light">#AD0101</color>
+    <color name="gray">#787878</color>
+    <color name="gray_dark">#B0B0B0</color>
+    <color name="text_black">#000000</color>
+    <color name="text_white">#FFFFFF</color>
+
+    <!-- Colores básicos -->
+    <color name="white">#FFFFFF</color>
+    <color name="white_secondary">#CDCDCD</color>
+    <color name="black">#353535</color>
+    <color name="black_secondary">#626262</color>
+    <color name="transparent">#00000000</color>
+
 </resources>
