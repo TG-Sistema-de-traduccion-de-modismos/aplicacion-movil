@@ -30,10 +30,10 @@ class WelcomeActivity : AppCompatActivity() {
         }
 
         // Redirigir a la pantalla de crear cuenta
-        /*signupLink.setOnClickListener {
+        signupLink.setOnClickListener {
             val intent = Intent(this, RegisterActivity::class.java)
             startActivity(intent)
-        }*/
+        }
     }
 
     private fun setupTransparentBars() {

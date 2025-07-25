@@ -1,4 +1,31 @@
 <resources>
     <string name="app_name">Modistra</string>
     <string name="logo_description">Logo modistra</string>
+    <string name="close">cerrar acuerdo</string>
+    <string name="last_terms_update">Última actualización: 1 de julio de 2025</string>
+    <string name="terms_introduction">Bienvenido a ModisTra, una aplicación diseñada para facilitar la comprensión y traducción de modismos y expresiones propias de Bogotá, Colombia. Al usar esta aplicación, aceptas los siguientes términos y condiciones:</string>
+    <string name="first_terms_clause">1. Uso de la aplicación</string>
+    <string name="first_terms_clause_content">ModisTra está pensada con fines educativos, culturales e informativos. El contenido no debe interpretarse como una traducción oficial o académica. Se prohíbe el uso de esta app con fines ilegales, ofensivos o discriminatorios.</string>
+    <string name="second_terms_clause">2. Propiedad intelectual</string>
+    <string name="second_terms_clause_content"><![CDATA[Todo el contenido de la app, incluyendo definiciones, ejemplos, diseño, íconos, logotipo y código, es propiedad de los desarrolladores de ModisTra y de sus respectivos autores y está protegido por las leyes de propiedad intelectual.]]></string>
+    <string name="third_terms_clause">3. Limitación de responsabilidad</string>
+    <string name="third_terms_clause_content">ModisTra no garantiza la precisión o actualidad de los modismos y no se hace responsable por malentendidos, interpretaciones erróneas o consecuencias derivadas del uso del contenido.</string>
+    <string name="fourth_terms_clause">4. Privacidad y datos</string>
+    <string name="fourth_terms_clause_content">La app puede recopilar datos básicos para mejorar la experiencia del usuario (como frecuencia de uso o expresiones más buscadas). No se recopila información personal sin tu consentimiento. Para más detalles revisa nuestra Política de Privacidad.</string>
+    <string name="accept_button">Aceptar</string>
+    <!-- Strings used for fragments for navigation -->
+    <string name="first_fragment_label">First Fragment</string>
+    <string name="second_fragment_label">Second Fragment</string>
+    <string name="next">Next</string>
+    <string name="previous">Previous</string>
+    <string name="nav_dictionary">Diccionario</string>
+    <string name="nav_home">home</string>
+    <string name="nav_search">buscar\n</string>
+    <string name="home_title">Conversaciones\n</string>
+    <string name="label_texto">Texto</string>
+    <string name="hint_escribe_aqui">Escribe aqui....</string>
+    <string name="analizar">Analizar</string>
+    <string name="label_audio">Audio</string>
+
+
 </resources>

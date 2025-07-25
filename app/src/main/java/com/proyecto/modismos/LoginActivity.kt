@@ -1,6 +1,9 @@
 package com.proyecto.modismos
 
+import android.content.Intent
 import android.os.Bundle
+import android.widget.Button
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.view.WindowCompat
@@ -13,6 +16,20 @@ class LoginActivity : AppCompatActivity() {
 
         setupTransparentBars()
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
+
+        val registerLinkTextView = findViewById<TextView>(R.id.registerLink)
+
+        registerLinkTextView.setOnClickListener {
+            val intent = Intent(this, RegisterActivity::class.java)
+            startActivity(intent)
+        }
+
+        val loginLinkButton = findViewById<Button>(R.id.loginButton)
+
+        loginLinkButton.setOnClickListener {
+            val intent = Intent(this, VerifyIdentityActivity::class.java)
+            startActivity(intent)
+        }
     }
 
     private fun setupTransparentBars() {

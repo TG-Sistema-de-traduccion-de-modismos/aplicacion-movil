@@ -12,6 +12,21 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
+            android:name=".DictionaryActivity"
+            android:exported="false" />
+        <activity
+            android:name=".VerifyIdentityActivity"
+            android:exported="false" />
+        <activity
+            android:name=".TermsConditionsActivity"
+            android:exported="false" />
+        <activity
+            android:name=".RegisterActivity"
+            android:exported="false" />
+        <activity
+            android:name=".HomeActivity"
+            android:exported="false" />
+        <activity
             android:name=".LoginActivity"
             android:exported="false" />
         <activity
