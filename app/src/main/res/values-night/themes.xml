@@ -14,6 +14,7 @@
         <item name="colorSurface">@color/black_secondary</item>
         <item name="colorOnSurface">@color/black_secondary</item>
         <item name="colorOnBackground">@color/black</item>
+        <item name="colorButtonNormal">@color/white_secondary</item>
 
         <!-- Status bar transparente -->
         <item name="android:statusBarColor">@android:color/transparent</item>
