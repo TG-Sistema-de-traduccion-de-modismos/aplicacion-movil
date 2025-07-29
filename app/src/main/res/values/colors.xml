@@ -5,6 +5,7 @@
     <color name="red_primary">#C00F0C</color>
     <color name="red_primary_dark">#B00505</color>
     <color name="red_primary_light">#AD0101</color>
+    <color name="gray_light">#A9A9A9</color>
     <color name="gray">#787878</color>
     <color name="gray_dark">#B0B0B0</color>
     <color name="text_black">#000000</color>

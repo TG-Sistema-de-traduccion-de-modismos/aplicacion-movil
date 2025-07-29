@@ -9,6 +9,7 @@ import android.os.Looper
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.SeekBar
@@ -17,9 +18,12 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.button.MaterialButton
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.proyecto.modismos.activities.AudioRecorderActivity
 import com.proyecto.modismos.R
+import com.proyecto.modismos.activities.UserMainActivity
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
@@ -35,6 +39,11 @@ class HomeFragment : Fragment() {
     private lateinit var tvCurrentTime: TextView
     private lateinit var tvTotalTime: TextView
     private lateinit var tvAudioName: TextView
+    private lateinit var btnDictionary: MaterialButton
+    private lateinit var btnProfile: ImageView
+    private lateinit var etTexto: EditText
+    private lateinit var btnAnalizarTexto: MaterialButton
+    private lateinit var btnAnalizarAudio: MaterialButton
 
     private var recordedAudioPath: String? = null
     private var mediaPlayer: MediaPlayer? = null
@@ -91,9 +100,31 @@ class HomeFragment : Fragment() {
         tvCurrentTime = view.findViewById(R.id.tvCurrentTime)
         tvTotalTime = view.findViewById(R.id.tvTotalTime)
         tvAudioName = view.findViewById(R.id.tvAudioName)
+        btnDictionary = view.findViewById(R.id.btnDiccionario)
+        etTexto = view.findViewById(R.id.etTexto)
+        btnAnalizarTexto = view.findViewById(R.id.btnAnalizarTexto)
+        btnAnalizarAudio = view.findViewById(R.id.btnAnalizarAudio)
+        btnProfile = view.findViewById(R.id.btnProfile)
+
     }
 
     private fun setupClickListeners() {
+
+        btnProfile.setOnClickListener {
+            val profileFragment = ProfileFragment.newInstance()
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.fragment_container, profileFragment)
+                .addToBackStack(null)
+                .commit()
+        }
+
+
+        btnDictionary.setOnClickListener {
+            (activity as? UserMainActivity)?.let { mainActivity ->
+                mainActivity.findViewById<BottomNavigationView>(R.id.bottom_navigation).selectedItemId = R.id.nav_dictionary
+            }
+        }
+
         fabMicrophone.setOnClickListener {
             openAudioRecorder()
         }
@@ -110,6 +141,14 @@ class HomeFragment : Fragment() {
             deleteAudio()
         }
 
+        btnAnalizarTexto.setOnClickListener {
+            analizarTexto()
+        }
+
+        btnAnalizarAudio.setOnClickListener {
+            analizarAudio()
+        }
+
         seekBarAudio.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
                 if (fromUser) {
@@ -121,6 +160,49 @@ class HomeFragment : Fragment() {
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}
             override fun onStopTrackingTouch(seekBar: SeekBar?) {}
         })
+    }
+
+    private fun analizarTexto() {
+        val texto = etTexto.text.toString().trim()
+
+        if (texto.isEmpty()) {
+            Toast.makeText(requireContext(), "Por favor ingresa un texto para analizar", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        // Navegar al AnalysisFragment con el texto
+        val analysisFragment = AnalysisFragment.newInstance(
+            type = AnalysisFragment.TYPE_TEXT,
+            content = texto
+        )
+
+        parentFragmentManager.beginTransaction()
+            .replace(R.id.fragment_container, analysisFragment)
+            .addToBackStack(null)
+            .commit()
+    }
+
+    private fun analizarAudio() {
+        if (recordedAudioPath.isNullOrEmpty()) {
+            Toast.makeText(requireContext(), "Por favor graba o sube un audio primero", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        // Aquí simularemos una transcripción del audio
+        // En producción, esto debería enviarse a un servicio de transcripción
+        val transcripcionSimulada = "oye viste el nuevo lugar que abrieron en el centro si fui ayer y esta bacano la comida y el ambiente es super chevere deberíamos ir un día de estos claro me avisas cuando puedes y cuadramos algo de una"
+
+        // Navegar al AnalysisFragment con la transcripción y el path del audio
+        val analysisFragment = AnalysisFragment.newInstance(
+            type = AnalysisFragment.TYPE_AUDIO,
+            content = transcripcionSimulada,
+            audioPath = recordedAudioPath
+        )
+
+        parentFragmentManager.beginTransaction()
+            .replace(R.id.fragment_container, analysisFragment)
+            .addToBackStack(null)
+            .commit()
     }
 
     private fun openAudioRecorder() {

@@ -10,9 +10,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.card.MaterialCardView
 import com.proyecto.modismos.R
 import com.proyecto.modismos.activities.WordDetailActivity
-import com.proyecto.modismos.fragments.DictionaryFragment
+import com.proyecto.modismos.models.Modismo
 
-class WordAdapter(private val modismos: List<DictionaryFragment.Modismo>) :
+class WordAdapter(private val modismos: List<Modismo>) :
     RecyclerView.Adapter<WordAdapter.ModismoViewHolder>() {
 
     class ModismoViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {

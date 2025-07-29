@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/cardModismo"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="12dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="0dp"
+    android:backgroundTint="?attr/colorOnSurface"
+    android:clickable="true"
+    android:focusable="true"
+    android:foreground="?attr/selectableItemBackground">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- Header del modismo -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            >
+
+            <TextView
+                android:id="@+id/tvPalabra"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Bacano"
+                android:textColor="?attr/textAppearanceBody1"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:fontFamily="sans-serif-medium" />
+
+            <ImageView
+                android:id="@+id/ivExpandIcon"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_expand"
+                app:tint="?attr/colorOnSurface"
+                android:rotation="0" />
+        </LinearLayout>
+
+        <!-- Contenido expandible -->
+        <LinearLayout
+            android:id="@+id/llExpandedContent"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone"
+            android:layout_marginTop="12dp"
+            android:backgroundTint="?attr/colorTertiary">
+
+            <!-- Definición -->
+            <TextView
+                android:id="@+id/tvDefinicion"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Algo o alguien que es muy bueno, excelente, genial o atractivo."
+                android:textColor="?attr/textAppearanceBody1"
+                android:textSize="14sp"
+                android:lineSpacingExtra="2dp"
+                android:layout_marginBottom="8dp" />
+
+            <!-- Sinónimos con punto rojo -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="• "
+                    android:textColor="@color/red_primary"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvSinonimos"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Genial, estupendo, agradable"
+                    android:textColor="@color/red_primary"
+                    android:textSize="14sp" />
+
+                <!-- Ícono de información -->
+                <ImageView
+                    android:id="@+id/ivInfoIcon"
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_info"
+                    android:background="@drawable/circle_background_dark"
+                    android:padding="4dp"
+                    app:tint="@color/white"
+                    android:layout_marginStart="8dp" />
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+</com.google.android.material.card.MaterialCardView>

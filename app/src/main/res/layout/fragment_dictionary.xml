@@ -28,6 +28,7 @@
             android:backgroundTint="@color/white">
 
             <ImageView
+                android:id="@+id/btnProfile"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:src="@drawable/ic_profile"
