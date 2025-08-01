@@ -39,7 +39,7 @@ class WordDetailActivity : AppCompatActivity() {
             val definicionView = LayoutInflater.from(this)
                 .inflate(R.layout.item_definition, definicionesContainer, false)
 
-            val numeroTextView = definicionView.findViewById<TextView>(R.id.tv_numero_definicion)
+            val numeroTextView = definicionView.findViewById<TextView>(R.id.btnNumeroDefinicion)
             val definicionTextView = definicionView.findViewById<TextView>(R.id.tv_definicion)
 
             numeroTextView.text = (index + 1).toString()

@@ -26,7 +26,7 @@ class UserMainActivity : AppCompatActivity() {
 
         val fragment = when (targetFragment) {
             R.id.nav_dictionary -> DictionaryFragment()
-            //R.id.nav_shopping -> ShoppingFragment()
+            R.id.nav_profile -> ProfileFragment()
             else -> HomeFragment()
         }
 
@@ -42,6 +42,7 @@ class UserMainActivity : AppCompatActivity() {
             val fragment: Fragment = when (item.itemId) {
                 R.id.nav_home -> HomeFragment()
                 R.id.nav_dictionary -> DictionaryFragment()
+                R.id.nav_profile -> ProfileFragment()
                 else -> return@setOnItemSelectedListener false
             }
 

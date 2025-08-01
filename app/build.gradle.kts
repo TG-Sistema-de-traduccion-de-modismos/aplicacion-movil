@@ -40,6 +40,7 @@ android {
 }
 
 dependencies {
+    implementation(libs.material.v190)
     implementation(libs.android.spinkit)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

@@ -4,9 +4,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="?attr/colorOnBackground">
+    android:background="?attr/colorSurface">
 
-    <!-- Header con fondo rojo -->
+    <!-- Header -->
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="200dp"
@@ -17,33 +17,19 @@
         android:paddingBottom="24dp"
         android:elevation="8dp">
 
-        <!-- Botón cerrar -->
-        <ImageView
-            android:id="@+id/btnClose"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:layout_alignParentEnd="true"
-            android:src="@drawable/ic_close"
-            app:tint="@color/white"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:padding="4dp" />
-
-        <!-- Título Perfil -->
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_centerHorizontal="true"
+            android:layout_centerInParent="true"
             android:text="Perfil"
             android:textColor="?attr/colorOnPrimary"
             android:textSize="36sp"
             android:textStyle="bold"
             android:fontFamily="sans-serif-medium"
             android:letterSpacing="0.02" />
-
     </RelativeLayout>
 
-    <!-- Contenido principal -->
+    <!-- Contenido -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -53,14 +39,14 @@
         android:paddingEnd="24dp"
         android:paddingTop="40dp">
 
-        <!-- Campo Email -->
+        <!-- Email -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="20dp"
             app:cardCornerRadius="16dp"
-            app:cardElevation="8dp"
-            android:backgroundTint="@color/gray_light">
+            app:cardElevation="4dp"
+            app:cardBackgroundColor="?attr/colorSurfaceVariant">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -73,7 +59,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Email"
-                    android:textColor="?attr/textAppearanceBody1"
+                    android:textColor="?attr/colorOnSurface"
                     android:textSize="18sp"
                     android:textStyle="bold"
                     android:layout_marginEnd="40dp"
@@ -85,23 +71,22 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="pablo@gmail.com"
-                    android:textColor="?attr/colorOnBackground"
+                    android:textColor="?attr/colorOnSurface"
                     android:textSize="16sp"
                     android:background="@android:color/transparent"
                     android:enabled="false"
                     android:inputType="textEmailAddress" />
-
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Campo Contraseña -->
+        <!-- Contraseña -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="24dp"
             app:cardCornerRadius="16dp"
-            app:cardElevation="8dp"
-            android:backgroundTint="@color/gray_light">
+            app:cardElevation="4dp"
+            app:cardBackgroundColor="?attr/colorSurfaceVariant">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -114,7 +99,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Contraseña"
-                    android:textColor="?attr/textAppearanceBody1"
+                    android:textColor="?attr/colorOnSurface"
                     android:textSize="18sp"
                     android:textStyle="bold"
                     android:layout_marginEnd="40dp"
@@ -126,7 +111,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="****************"
-                    android:textColor="?attr/colorOnBackground"
+                    android:textColor="?attr/colorOnSurface"
                     android:textSize="16sp"
                     android:background="@android:color/transparent"
                     android:enabled="false"
@@ -137,34 +122,33 @@
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:src="@drawable/ic_visibility_off"
-                    app:tint="@color/gray"
+                    app:tint="?attr/colorOutline"
                     android:background="?attr/selectableItemBackgroundBorderless"
                     android:padding="2dp"
                     android:layout_marginStart="12dp" />
-
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Cambiar de contraseña -->
-        <TextView
-            android:id="@+id/tvChangePassword"
+        <!-- Botón cambiar contraseña -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnChangePassword"
+            style="?attr/materialButtonOutlinedStyle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Cambiar de contraseña"
             android:textColor="?attr/colorPrimary"
-            android:textSize="16sp"
-            android:textStyle="bold"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:padding="8dp"
-            android:drawableEnd="@drawable/ic_refresh"
-            android:drawablePadding="8dp"
-            app:drawableTint="?attr/colorPrimary" />
-
+            android:textAllCaps="false"
+            android:layout_gravity="center"
+            app:icon="@drawable/ic_refresh"
+            app:iconTint="?attr/colorPrimary"
+            app:iconPadding="8dp"
+            app:cornerRadius="12dp"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="6dp" />
     </LinearLayout>
 
-    <!-- Espacio para la navegación inferior -->
+    <!-- Espacio inferior -->
     <View
         android:layout_width="match_parent"
         android:layout_height="80dp" />
-
 </LinearLayout>

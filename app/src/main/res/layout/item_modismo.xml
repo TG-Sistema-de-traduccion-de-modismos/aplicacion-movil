@@ -5,9 +5,9 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginBottom="12dp"
-    app:cardCornerRadius="12dp"
-    app:cardElevation="0dp"
-    android:backgroundTint="?attr/colorOnSurface"
+    app:cardCornerRadius="16dp"
+    app:cardElevation="2dp"
+    app:cardBackgroundColor="?attr/colorSurfaceVariant"
     android:clickable="true"
     android:focusable="true"
     android:foreground="?attr/selectableItemBackground">
@@ -16,15 +16,15 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="16dp">
+        android:padding="16dp"
+        android:animateLayoutChanges="true">
 
         <!-- Header del modismo -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:gravity="center_vertical"
-            >
+            android:gravity="center_vertical">
 
             <TextView
                 android:id="@+id/tvPalabra"
@@ -32,7 +32,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="Bacano"
-                android:textColor="?attr/textAppearanceBody1"
+                android:textColor="?attr/colorOnSurface"
                 android:textSize="18sp"
                 android:textStyle="bold"
                 android:fontFamily="sans-serif-medium" />
@@ -54,7 +54,8 @@
             android:orientation="vertical"
             android:visibility="gone"
             android:layout_marginTop="12dp"
-            android:backgroundTint="?attr/colorTertiary">
+            android:padding="12dp"
+            android:background="?attr/colorSurface">
 
             <!-- Definición -->
             <TextView
@@ -62,12 +63,12 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Algo o alguien que es muy bueno, excelente, genial o atractivo."
-                android:textColor="?attr/textAppearanceBody1"
+                android:textColor="?attr/colorOnSurface"
                 android:textSize="14sp"
                 android:lineSpacingExtra="2dp"
                 android:layout_marginBottom="8dp" />
 
-            <!-- Sinónimos con punto rojo -->
+            <!-- Sinónimos -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -78,7 +79,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="• "
-                    android:textColor="@color/red_primary"
+                    android:textColor="?attr/colorPrimary"
                     android:textSize="16sp"
                     android:textStyle="bold" />
 
@@ -88,19 +89,21 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="Genial, estupendo, agradable"
-                    android:textColor="@color/red_primary"
+                    android:textColor="?attr/colorPrimary"
                     android:textSize="14sp" />
 
-                <!-- Ícono de información -->
-                <ImageView
-                    android:id="@+id/ivInfoIcon"
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:src="@drawable/ic_info"
-                    android:background="@drawable/circle_background_dark"
-                    android:padding="4dp"
-                    app:tint="@color/white"
-                    android:layout_marginStart="8dp" />
+                <!-- Botón info moderno -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnInfo"
+                    style="@style/Widget.Material3.Button.Icon"
+                    android:layout_width="36dp"
+                    android:layout_height="36dp"
+                    app:cornerRadius="18dp"
+                    app:iconPadding="0dp"
+                    app:icon="@drawable/ic_info"
+                    app:iconTint="?attr/colorOnPrimary"
+                    app:backgroundTint="?attr/colorPrimary"
+                    android:layout_marginStart="8dp"/>
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>

@@ -53,7 +53,6 @@ class DictionaryFragment : Fragment() {
 
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: WordAdapter
-    private lateinit var btnProfile: ImageView
 
 
     override fun onCreateView(
@@ -75,17 +74,11 @@ class DictionaryFragment : Fragment() {
     }
 
     private fun initViews(view: View) {
-        btnProfile = view.findViewById(R.id.btnProfile)
+
     }
+
     private fun setupClickListeners() {
 
-        btnProfile.setOnClickListener {
-            val profileFragment = ProfileFragment.newInstance()
-            parentFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, profileFragment)
-                .addToBackStack(null)
-                .commit()
-        }
     }
 
     private fun setupRecyclerView(view: View) {

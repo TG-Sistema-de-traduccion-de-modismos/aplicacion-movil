@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.Fragment
+import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.proyecto.modismos.R
@@ -17,8 +18,7 @@ class ProfileFragment : Fragment() {
     private lateinit var etEmail: TextInputEditText
     private lateinit var etPassword: TextInputEditText
     private lateinit var btnTogglePassword: ImageView
-    private lateinit var tvChangePassword: TextView
-    private lateinit var btnClose: ImageView
+    private lateinit var btnChangePassword: MaterialButton
 
     private var isPasswordVisible = false
 
@@ -41,8 +41,7 @@ class ProfileFragment : Fragment() {
         etEmail = view.findViewById(R.id.etEmail)
         etPassword = view.findViewById(R.id.etPassword)
         btnTogglePassword = view.findViewById(R.id.btnTogglePassword)
-        tvChangePassword = view.findViewById(R.id.tvChangePassword)
-        btnClose = view.findViewById(R.id.btnClose)
+        btnChangePassword = view.findViewById(R.id.btnChangePassword)
     }
 
     private fun setupClickListeners() {
@@ -50,15 +49,11 @@ class ProfileFragment : Fragment() {
             togglePasswordVisibility()
         }
 
-        tvChangePassword.setOnClickListener {
+        btnChangePassword.setOnClickListener {
             // Aquí iría la lógica para cambiar contraseña
             // Por ahora solo mostramos un mensaje
         }
 
-        btnClose.setOnClickListener {
-            // Cerrar el fragmento y volver al anterior
-            parentFragmentManager.popBackStack()
-        }
     }
 
     private fun setupInitialData() {

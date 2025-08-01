@@ -2,62 +2,43 @@
 <!-- res/values/styles.xml -->
 <resources>
     <!-- Tema base claro con barras transparentes -->
-    <style name="AppTheme" parent="Theme.MaterialComponents.DayNight.DarkActionBar">
+    <style name="AppTheme" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Colores principales -->
         <item name="colorPrimary">@color/red_primary</item>
-        <item name="colorPrimaryVariant">@color/red_primary_dark</item>
         <item name="colorOnPrimary">@color/white</item>
-        <item name="android:editTextColor">@color/gray</item>
-        <item name="textAppearanceBody1">@color/text_black</item>
-
-        <!-- Colores de superficie -->
-        <item name="colorSurface">@color/white_secondary</item>
-        <item name="colorOnSurface">@color/white_secondary</item>
-        <item name="colorOnBackground">@color/white</item>
-        <item name="colorButtonNormal">@color/black_secondary</item>
+        <item name="colorSecondary">@color/red_primary_dark</item>
+        <item name="colorOnSecondary">@color/white_secondary</item>
         <item name="colorTertiary">@color/gray_light</item>
+        <item name="colorOnTertiary">@color/white</item>
 
+        <!-- Superficies -->
+        <item name="colorSurface">@color/white</item>
+        <item name="colorOnSurface">@color/text_black</item>
+        <item name="colorOnBackground">@color/white</item>
 
+        <!-- Status y Navigation bar -->
         <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:windowLightStatusBar">true</item>
         <item name="android:navigationBarColor">@android:color/transparent</item>
-        <item name="android:windowLightStatusBar">true</item> <!-- o false si es modo oscuro -->
         <item name="android:windowLightNavigationBar">true</item>
-
-        <!-- Configuración para pantalla completa -->
-        <item name="android:windowTranslucentStatus">false</item>
-        <item name="android:windowTranslucentNavigation">false</item>
-        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
 
         <!-- Botones -->
         <item name="materialButtonStyle">@style/AppButton</item>
         <item name="borderlessButtonStyle">@style/AppButton.Borderless</item>
-
-        <!-- FitsSystemWindows para manejar el padding correctamente -->
-        <item name="android:fitsSystemWindows">false</item>
-
-
     </style>
 
-    <!-- Tema para Splash Screen con barras transparentes -->
-    <style name="SplashTheme" parent="AppTheme">
-        <item name="android:statusBarColor">@android:color/transparent</item>
-        <item name="android:navigationBarColor">@android:color/transparent</item>
-        <item name="android:windowLightStatusBar">false</item>
-        <item name="android:windowLightNavigationBar">false</item>
-    </style>
-
-    <!-- Estilo de botones -->
-    <style name="AppButton" parent="Widget.MaterialComponents.Button">
+    <style name="AppButton" parent="Widget.Material3.Button">
         <item name="android:layout_height">56dp</item>
         <item name="android:textSize">16sp</item>
         <item name="android:textAllCaps">false</item>
         <item name="cornerRadius">28dp</item>
     </style>
 
-    <style name="AppButton.Borderless" parent="Widget.MaterialComponents.Button.TextButton">
+    <style name="AppButton.Borderless" parent="Widget.Material3.Button.TextButton">
         <item name="android:layout_height">48dp</item>
         <item name="android:textSize">14sp</item>
         <item name="android:textAllCaps">false</item>
         <item name="android:textColor">@color/red_primary</item>
     </style>
+
 </resources>

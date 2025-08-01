@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/colorOnBackground">
+    android:background="?attr/colorSurface">
 
     <LinearLayout
         android:orientation="vertical"
@@ -25,18 +25,17 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:text="Términos del servicio"
-                android:textSize="24sp"
                 android:textStyle="bold"
-                android:textColor="?attr/colorPrimaryVariant"
-                android:textAppearance="?attr/textAppearanceHeadline6" />
+                android:textColor="?attr/colorPrimary"
+                style="?attr/textAppearanceHeadlineMedium" />
 
             <ImageView
                 android:id="@+id/closeButton"
                 android:layout_width="32dp"
                 android:layout_height="32dp"
                 android:src="@drawable/ic_close"
-                android:contentDescription="@string/close"/>
-
+                android:contentDescription="@string/close"
+                app:tint="?attr/colorOnSurface" />
         </LinearLayout>
 
         <!-- Fecha de actualización -->
@@ -46,9 +45,8 @@
             android:layout_marginStart="24dp"
             android:layout_marginTop="8dp"
             android:text="Última actualización: 1 de julio de 2025"
-            android:textSize="12sp"
-            android:textColor="?attr/colorOnSurface"
-            android:textAppearance="?attr/textAppearanceCaption" />
+            android:textColor="?attr/colorOnSurfaceVariant"
+            style="?attr/textAppearanceBodySmall" />
 
         <!-- Línea divisoria -->
         <View
@@ -57,7 +55,7 @@
             android:layout_marginTop="8dp"
             android:layout_marginStart="24dp"
             android:layout_marginEnd="24dp"
-            android:background="?attr/colorControlNormal" />
+            android:background="?attr/colorOutlineVariant" />
 
         <!-- Contenido desplazable -->
         <ScrollView
@@ -76,96 +74,87 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Bienvenido a ModisTra, una aplicación diseñada para facilitar la comprensión y traducción de modismos y expresiones propias de Bogotá, Colombia. Al usar esta aplicación, aceptas los siguientes términos y condiciones:"
-                    android:textSize="14sp"
-                    android:textColor="?attr/textAppearanceBody1"
                     android:lineSpacingExtra="4dp"
                     android:layout_marginBottom="16dp"
-                    android:textAppearance="?attr/textAppearanceBody2" />
+                    android:textColor="?attr/colorOnSurface"
+                    style="?attr/textAppearanceBodyMedium" />
 
                 <!-- Sección 1 -->
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="1. Uso de la aplicación"
-                    android:textSize="16sp"
                     android:textStyle="bold"
-                    android:textColor="?attr/textAppearanceBody1"
                     android:layout_marginBottom="4dp"
-                    android:textAppearance="?attr/textAppearanceSubtitle1" />
+                    android:textColor="?attr/colorOnSurface"
+                    style="?attr/textAppearanceTitleMedium" />
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="ModisTra está pensada con fines educativos, culturales e informativos. El contenido no debe interpretarse como una traducción oficial o académica. Se prohíbe el uso de esta app con fines ilegales, ofensivos o discriminatorios."
-                    android:textSize="14sp"
-                    android:textColor="?attr/textAppearanceBody1"
                     android:layout_marginBottom="16dp"
-                    android:textAppearance="?attr/textAppearanceBody2" />
+                    android:textColor="?attr/colorOnSurface"
+                    style="?attr/textAppearanceBodyMedium" />
 
                 <!-- Sección 2 -->
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="2. Propiedad intelectual"
-                    android:textSize="16sp"
                     android:textStyle="bold"
-                    android:textColor="?attr/textAppearanceBody1"
                     android:layout_marginBottom="4dp"
-                    android:textAppearance="?attr/textAppearanceSubtitle1" />
+                    android:textColor="?attr/colorOnSurface"
+                    style="?attr/textAppearanceTitleMedium" />
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="Todo el contenido de la app, incluyendo definiciones, ejemplos, diseño, íconos, logotipo y código, es propiedad de los desarrolladores de ModisTra y de sus respectivos autores y está protegido por las leyes de propiedad intelectual."
-                    android:textSize="14sp"
-                    android:textColor="?attr/textAppearanceBody1"
                     android:layout_marginBottom="16dp"
-                    android:textAppearance="?attr/textAppearanceBody2" />
+                    android:textColor="?attr/colorOnSurface"
+                    style="?attr/textAppearanceBodyMedium" />
 
                 <!-- Sección 3 -->
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="3. Limitación de responsabilidad"
-                    android:textSize="16sp"
                     android:textStyle="bold"
-                    android:textColor="?attr/textAppearanceBody1"
                     android:layout_marginBottom="4dp"
-                    android:textAppearance="?attr/textAppearanceSubtitle1" />
+                    android:textColor="?attr/colorOnSurface"
+                    style="?attr/textAppearanceTitleMedium" />
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="ModisTra no garantiza la precisión o actualidad de los modismos y no se hace responsable por malentendidos, interpretaciones erróneas o consecuencias derivadas del uso del contenido."
-                    android:textSize="14sp"
-                    android:textColor="?attr/textAppearanceBody1"
                     android:layout_marginBottom="16dp"
-                    android:textAppearance="?attr/textAppearanceBody2" />
+                    android:textColor="?attr/colorOnSurface"
+                    style="?attr/textAppearanceBodyMedium" />
 
                 <!-- Sección 4 -->
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="4. Privacidad y datos"
-                    android:textSize="16sp"
                     android:textStyle="bold"
-                    android:textColor="?attr/textAppearanceBody1"
                     android:layout_marginBottom="4dp"
-                    android:textAppearance="?attr/textAppearanceSubtitle1" />
+                    android:textColor="?attr/colorOnSurface"
+                    style="?attr/textAppearanceTitleMedium" />
 
                 <TextView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:text="La app puede recopilar datos básicos para mejorar la experiencia del usuario (como frecuencia de uso o expresiones más buscadas). No se recopila información personal sin tu consentimiento. Para más detalles revisa nuestra Política de Privacidad."
-                    android:textSize="14sp"
-                    android:textColor="?attr/textAppearanceBody1"
                     android:layout_marginBottom="16dp"
-                    android:textAppearance="?attr/textAppearanceBody2" />
+                    android:textColor="?attr/colorOnSurface"
+                    style="?attr/textAppearanceBodyMedium" />
             </LinearLayout>
         </ScrollView>
 
         <!-- Botón Aceptar -->
-        <Button
+        <com.google.android.material.button.MaterialButton
             android:id="@+id/acceptButton"
             android:layout_width="match_parent"
             android:layout_height="56dp"
@@ -174,9 +163,10 @@
             android:layout_marginBottom="32dp"
             android:text="Aceptar"
             android:textAllCaps="false"
-            android:textSize="16sp"
             android:textStyle="bold"
+            app:cornerRadius="12dp"
+            app:backgroundTint="@color/red_primary"
             android:textColor="@android:color/white"
-            android:background="@drawable/rounded_button_red" />
+            style="@style/Widget.Material3.Button" />
     </LinearLayout>
 </FrameLayout>

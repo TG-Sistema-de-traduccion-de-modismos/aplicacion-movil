@@ -35,7 +35,7 @@ class ModismosAdapter(
         private val llExpandedContent: LinearLayout = itemView.findViewById(R.id.llExpandedContent)
         private val tvDefinicion: TextView = itemView.findViewById(R.id.tvDefinicion)
         private val tvSinonimos: TextView = itemView.findViewById(R.id.tvSinonimos)
-        private val ivInfoIcon: ImageView = itemView.findViewById(R.id.ivInfoIcon)
+        private val ivInfoIcon: ImageView = itemView.findViewById(R.id.btnInfo)
 
         fun bind(modismo: Modismo) {
             tvPalabra.text = modismo.palabra

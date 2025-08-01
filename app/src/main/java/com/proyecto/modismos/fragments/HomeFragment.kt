@@ -40,7 +40,6 @@ class HomeFragment : Fragment() {
     private lateinit var tvTotalTime: TextView
     private lateinit var tvAudioName: TextView
     private lateinit var btnDictionary: MaterialButton
-    private lateinit var btnProfile: ImageView
     private lateinit var etTexto: EditText
     private lateinit var btnAnalizarTexto: MaterialButton
     private lateinit var btnAnalizarAudio: MaterialButton
@@ -104,20 +103,10 @@ class HomeFragment : Fragment() {
         etTexto = view.findViewById(R.id.etTexto)
         btnAnalizarTexto = view.findViewById(R.id.btnAnalizarTexto)
         btnAnalizarAudio = view.findViewById(R.id.btnAnalizarAudio)
-        btnProfile = view.findViewById(R.id.btnProfile)
 
     }
 
     private fun setupClickListeners() {
-
-        btnProfile.setOnClickListener {
-            val profileFragment = ProfileFragment.newInstance()
-            parentFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, profileFragment)
-                .addToBackStack(null)
-                .commit()
-        }
-
 
         btnDictionary.setOnClickListener {
             (activity as? UserMainActivity)?.let { mainActivity ->
