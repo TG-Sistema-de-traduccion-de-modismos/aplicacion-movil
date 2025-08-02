@@ -26,7 +26,9 @@ class VerifyIdentityActivity : AppCompatActivity() {
             delay(splashDelay)
             goToHome()
         }
+
     }
+
 
     private fun setupTransparentBars() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
@@ -39,7 +41,10 @@ class VerifyIdentityActivity : AppCompatActivity() {
     }
 
     private fun goToHome() {
-        startActivity(Intent(this, UserMainActivity::class.java))
-        finish()
+        val intent = Intent(this, UserMainActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        startActivity(intent)
     }
+
+
 }

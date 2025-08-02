@@ -1,12 +1,15 @@
 package com.proyecto.modismos.activities
 
+import android.app.AlertDialog
 import android.os.Bundle
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
 import androidx.fragment.app.Fragment
 import com.proyecto.modismos.fragments.*
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.proyecto.modismos.R
+
 
 class UserMainActivity : AppCompatActivity() {
 
@@ -56,7 +59,24 @@ class UserMainActivity : AppCompatActivity() {
         // Ahora, después de establecer el listener, selecciona el ítem:
         bottomNavigationView.selectedItemId = targetFragment
 
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                showExitDialog()
+            }
+        })
+
     }
+    private fun showExitDialog() {
+        AlertDialog.Builder(this)
+            .setTitle("¿Salir de la app?")
+            .setMessage("¿Estás seguro de que quieres salir?")
+            .setPositiveButton("Sí") { _, _ ->
+                finishAffinity() // Cierra completamente la app
+            }
+            .setNegativeButton("No", null)
+            .show()
+    }
+
 
     private fun setupTransparentBars() {
         WindowCompat.setDecorFitsSystemWindows(window, false)

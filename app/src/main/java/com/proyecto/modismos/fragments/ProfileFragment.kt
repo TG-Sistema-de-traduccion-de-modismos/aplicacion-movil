@@ -1,16 +1,16 @@
 package com.proyecto.modismos.fragments
 
+import android.content.Intent
 import android.os.Bundle
 import android.text.InputType
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import android.widget.TextView
 import androidx.fragment.app.Fragment
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
-import com.google.android.material.textfield.TextInputLayout
+import com.proyecto.modismos.activities.LoginActivity
 import com.proyecto.modismos.R
 
 class ProfileFragment : Fragment() {
@@ -19,6 +19,7 @@ class ProfileFragment : Fragment() {
     private lateinit var etPassword: TextInputEditText
     private lateinit var btnTogglePassword: ImageView
     private lateinit var btnChangePassword: MaterialButton
+    private lateinit var btnLogout: ImageView
 
     private var isPasswordVisible = false
 
@@ -42,6 +43,7 @@ class ProfileFragment : Fragment() {
         etPassword = view.findViewById(R.id.etPassword)
         btnTogglePassword = view.findViewById(R.id.btnTogglePassword)
         btnChangePassword = view.findViewById(R.id.btnChangePassword)
+        btnLogout = view.findViewById(R.id.btnLogout)
     }
 
     private fun setupClickListeners() {
@@ -51,36 +53,34 @@ class ProfileFragment : Fragment() {
 
         btnChangePassword.setOnClickListener {
             // Aquí iría la lógica para cambiar contraseña
-            // Por ahora solo mostramos un mensaje
         }
 
+        btnLogout.setOnClickListener {
+            val intent = Intent(requireContext(), LoginActivity::class.java)
+            intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            startActivity(intent)
+        }
     }
 
     private fun setupInitialData() {
-        // Datos quemados como solicitas
         etEmail.setText("pablo@gmail.com")
         etPassword.setText("****************")
 
-        // Email no editable
         etEmail.isEnabled = false
         etPassword.isEnabled = false
     }
 
     private fun togglePasswordVisibility() {
         if (isPasswordVisible) {
-            // Ocultar contraseña
             etPassword.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
             btnTogglePassword.setImageResource(R.drawable.ic_visibility_off)
             etPassword.setText("****************")
         } else {
-            // Mostrar contraseña
             etPassword.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
             btnTogglePassword.setImageResource(R.drawable.ic_visibility)
             etPassword.setText("miPassword123")
         }
         isPasswordVisible = !isPasswordVisible
-
-        // Mover el cursor al final del texto
         etPassword.setSelection(etPassword.text?.length ?: 0)
     }
 
