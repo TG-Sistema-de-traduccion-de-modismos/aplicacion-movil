@@ -10,7 +10,7 @@ import kotlinx.coroutines.*
 
 class VerifyIdentityActivity : AppCompatActivity() {
 
-    private val splashDelay = 5000L  // 5 segundos
+    private val splashDelay = 2000L
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "395070319187",
+    "project_id": "modistra-ae816",
+    "storage_bucket": "modistra-ae816.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:395070319187:android:ca4178032fd5e0e14774a6",
+        "android_client_info": {
+          "package_name": "com.proyecto.modismos"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDoD7gRIdu0-I4Wce7RehxC-w8BEJUNp7I"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
