@@ -8,6 +8,7 @@ import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.view.WindowCompat
@@ -29,6 +30,16 @@ class RegisterActivity : AppCompatActivity() {
 
     private lateinit var auth: FirebaseAuth
 
+    // Launcher para manejar el resultado de TermsConditionsActivity
+    private val termsActivityLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == RESULT_OK) {
+            val shouldCheckTerms = result.data?.getBooleanExtra("checkTerms", false) ?: false
+            termsCheckbox.isChecked = shouldCheckTerms
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_register)
@@ -41,11 +52,6 @@ class RegisterActivity : AppCompatActivity() {
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
 
         bindViews()
-
-        if (intent.getBooleanExtra("checkTerms", false)) {
-            termsCheckbox.isChecked = true
-        }
-
         setupListeners()
     }
 
@@ -63,7 +69,9 @@ class RegisterActivity : AppCompatActivity() {
         // Al pulsar en "Términos y condiciones"
         termsLinkTv.setOnClickListener {
             val intent = Intent(this, TermsConditionsActivity::class.java)
-            startActivity(intent)
+            // Pasamos el estado actual del checkbox
+            intent.putExtra("currentCheckState", termsCheckbox.isChecked)
+            termsActivityLauncher.launch(intent)
         }
 
         // Al pulsar en "Crear cuenta"

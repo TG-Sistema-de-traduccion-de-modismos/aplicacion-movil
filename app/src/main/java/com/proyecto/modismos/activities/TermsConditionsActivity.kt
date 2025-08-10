@@ -3,8 +3,8 @@ package com.proyecto.modismos.activities
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
-import android.widget.CheckBox
 import android.widget.ImageView
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.view.WindowCompat
@@ -14,7 +14,7 @@ class TermsConditionsActivity : AppCompatActivity() {
 
     private lateinit var closeButton: ImageView
     private lateinit var acceptButton: Button
-    private lateinit var termsCheckbox: CheckBox
+    private var currentCheckState = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -26,14 +26,12 @@ class TermsConditionsActivity : AppCompatActivity() {
 
         bindViews()
 
-        if (intent.getBooleanExtra("checkTerms", false)) {
-            termsCheckbox = findViewById(R.id.termsCheckbox)
-            termsCheckbox.isChecked = true
-        }
+        // Obtenemos el estado actual del checkbox que viene desde RegisterActivity
+        currentCheckState = intent.getBooleanExtra("currentCheckState", false)
 
         setupListeners()
+        setupBackPressedCallback()
     }
-
 
     private fun bindViews() {
         closeButton  = findViewById(R.id.closeButton)
@@ -41,20 +39,33 @@ class TermsConditionsActivity : AppCompatActivity() {
     }
 
     private fun setupListeners() {
-        // “X”: vuelve sin marcar
+        // "X": vuelve manteniendo el estado anterior del checkbox
         closeButton.setOnClickListener {
-            val intent = Intent(this, RegisterActivity::class.java)
-            startActivity(intent)
+            val resultIntent = Intent()
+            resultIntent.putExtra("checkTerms", currentCheckState)
+            setResult(RESULT_OK, resultIntent)
             finish()
         }
 
-        // “Aceptar”: vuelve marcando checkbox
+        // "Aceptar": vuelve marcando el checkbox como true
         acceptButton.setOnClickListener {
-            val intent = Intent(this, RegisterActivity::class.java)
-            intent.putExtra("checkTerms", true)
-            startActivity(intent)
+            val resultIntent = Intent()
+            resultIntent.putExtra("checkTerms", true)
+            setResult(RESULT_OK, resultIntent)
             finish()
         }
+    }
+
+    private fun setupBackPressedCallback() {
+        val callback = object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                val resultIntent = Intent()
+                resultIntent.putExtra("checkTerms", currentCheckState)
+                setResult(RESULT_OK, resultIntent)
+                finish()
+            }
+        }
+        onBackPressedDispatcher.addCallback(this, callback)
     }
 
     private fun setupTransparentBars() {
