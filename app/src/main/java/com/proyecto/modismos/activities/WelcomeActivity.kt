@@ -8,15 +8,27 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.view.WindowCompat
+import com.google.firebase.auth.FirebaseAuth
 import com.proyecto.modismos.R
 
 class WelcomeActivity : AppCompatActivity() {
+
+    private lateinit var auth: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         supportActionBar?.hide()
         setContentView(R.layout.activity_welcome)
+
+        // Inicializar Firebase Auth
+        auth = FirebaseAuth.getInstance()
+
+        // Verificar si el usuario ya está logueado
+        if (auth.currentUser != null) {
+            redirectToVerifyIdentityActivity()
+            return
+        }
 
         setupTransparentBars()
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
@@ -40,6 +52,14 @@ class WelcomeActivity : AppCompatActivity() {
                 .makeCustomAnimation(this, R.anim.fade_in, R.anim.fade_out)
             startActivity(intent, options.toBundle())
         }
+    }
+
+    private fun redirectToVerifyIdentityActivity() {
+        val intent = Intent(this, VerifyIdentityActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        val options = ActivityOptions
+            .makeCustomAnimation(this, R.anim.fade_in, R.anim.fade_out)
+        startActivity(intent, options.toBundle())
     }
 
     private fun setupTransparentBars() {
