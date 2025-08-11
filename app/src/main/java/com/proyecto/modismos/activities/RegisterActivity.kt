@@ -1,5 +1,6 @@
 package com.proyecto.modismos.activities
 
+import android.app.ActivityOptions
 import android.content.Intent
 import android.os.Bundle
 import android.util.Patterns
@@ -82,7 +83,9 @@ class RegisterActivity : AppCompatActivity() {
         // Al pulsar en "¿Ya tienes cuenta? Inicia sesión"
         loginLinkTv.setOnClickListener {
             val intent = Intent(this, LoginActivity::class.java)
-            startActivity(intent)
+            val options = ActivityOptions
+                .makeCustomAnimation(this, R.anim.fade_in, R.anim.fade_out)
+            startActivity(intent, options.toBundle())
         }
     }
 
@@ -114,7 +117,9 @@ class RegisterActivity : AppCompatActivity() {
                     // Redirigir a VerifyIdentityActivity o directamente al MainActivity
                     val intent = Intent(this, VerifyIdentityActivity::class.java)
                     intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                    startActivity(intent)
+                    val options = ActivityOptions
+                        .makeCustomAnimation(this, R.anim.fade_in, R.anim.fade_out)
+                    startActivity(intent, options.toBundle())
 
                 } else {
                     // Error en el registro

@@ -1,5 +1,6 @@
 package com.proyecto.modismos.activities
 
+import android.app.ActivityOptions
 import android.content.Intent
 import android.os.Bundle
 import android.util.Patterns
@@ -57,7 +58,9 @@ class LoginActivity : AppCompatActivity() {
     private fun setupListeners() {
         registerLinkTv.setOnClickListener {
             val intent = Intent(this, RegisterActivity::class.java)
-            startActivity(intent)
+            val options = ActivityOptions
+                .makeCustomAnimation(this, R.anim.fade_in, R.anim.fade_out)
+            startActivity(intent, options.toBundle())
         }
 
         loginBtn.setOnClickListener {
@@ -159,7 +162,9 @@ class LoginActivity : AppCompatActivity() {
     private fun redirectToMainActivity() {
         val intent = Intent(this, VerifyIdentityActivity::class.java) // Cambia por tu MainActivity principal
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        startActivity(intent)
+        val options = ActivityOptions
+            .makeCustomAnimation(this, R.anim.fade_in, R.anim.fade_out)
+        startActivity(intent, options.toBundle())
     }
 
     private fun setupTransparentBars() {

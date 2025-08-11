@@ -6,165 +6,340 @@
     android:orientation="vertical"
     android:background="?attr/colorSurface">
 
-    <!-- Header -->
+    <!-- Header con gradiente mejorado -->
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="200dp"
+        android:layout_height="wrap_content"
+        android:minHeight="240dp"
         android:background="@drawable/red_gradient_background"
         android:paddingStart="24dp"
         android:paddingEnd="24dp"
-        android:paddingTop="50dp"
-        android:paddingBottom="24dp"
-        android:elevation="8dp">
+        android:paddingTop="60dp"
+        android:paddingBottom="40dp"
+        android:elevation="12dp">
 
-        <!-- Botón logout -->
-        <ImageView
-            android:id="@+id/btnLogout"
+        <!-- Botón logout elegante -->
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
-            android:src="@drawable/ic_logout"
-            android:contentDescription="Cerrar sesión"
-            android:layout_marginTop="16dp"
-            android:layout_marginStart="16dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:padding="4dp"
-            app:tint="?attr/colorOnPrimary" />
+            app:cardCornerRadius="24dp"
+            app:cardElevation="6dp"
+            app:cardBackgroundColor="@android:color/white"
+            android:alpha="0.95"
+            android:layout_marginTop="8dp">
 
-        <!-- Título -->
-        <TextView
-            android:layout_width="wrap_content"
+            <ImageView
+                android:id="@+id/btnLogout"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_logout"
+                android:background="?android:attr/selectableItemBackgroundBorderless"
+                app:tint="?attr/colorPrimary"
+                android:clickable="true"
+                android:focusable="true"
+                android:contentDescription="Cerrar sesión" />
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Contenedor del perfil -->
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_centerInParent="true"
-            android:text="Perfil"
-            android:textColor="?attr/colorOnPrimary"
-            android:textSize="36sp"
-            android:textStyle="bold"
-            android:fontFamily="sans-serif-medium"
-            android:letterSpacing="0.02" />
+            android:orientation="vertical"
+            android:layout_centerVertical="true"
+            android:gravity="center"
+            android:layout_marginTop="20dp">
+
+            <!-- Avatar circular -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                app:cardCornerRadius="60dp"
+                app:cardElevation="8dp"
+                app:cardBackgroundColor="@android:color/white"
+                android:layout_marginBottom="20dp">
+
+                <ImageView
+                    android:id="@+id/ivProfileAvatar"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/ic_person"
+                    android:scaleType="centerCrop"
+                    android:padding="24dp"
+                    app:tint="?attr/colorPrimary" />
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Título mejorado -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Mi Perfil"
+                android:textColor="@android:color/white"
+                android:textSize="32sp"
+                android:textStyle="bold"
+                android:fontFamily="sans-serif-black"
+                android:letterSpacing="0.01"
+                android:shadowColor="#40000000"
+                android:shadowDx="0"
+                android:shadowDy="2"
+                android:shadowRadius="4" />
+        </LinearLayout>
     </RelativeLayout>
 
-    <!-- Contenido -->
-    <LinearLayout
+    <!-- Contenido principal con scroll -->
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:orientation="vertical"
-        android:paddingStart="24dp"
-        android:paddingEnd="24dp"
-        android:paddingTop="40dp">
+        android:scrollbars="none"
+        android:overScrollMode="never">
 
-        <!-- Email -->
-        <com.google.android.material.card.MaterialCardView
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="20dp"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="4dp"
-            app:cardBackgroundColor="?attr/colorSurfaceVariant">
+            android:orientation="vertical"
+            android:paddingStart="24dp"
+            android:paddingEnd="24dp"
+            android:paddingTop="32dp"
+            android:paddingBottom="40dp">
 
-            <LinearLayout
+            <!-- Sección de información personal -->
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:padding="20dp"
-                android:gravity="center_vertical">
+                android:layout_marginBottom="24dp"
+                app:cardCornerRadius="24dp"
+                app:cardElevation="8dp"
+                app:cardBackgroundColor="?attr/colorSurface"
+                app:strokeWidth="1dp"
+                app:strokeColor="?attr/colorOutlineVariant">
 
-                <TextView
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Email"
-                    android:textColor="?attr/colorOnSurface"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
-                    android:layout_marginEnd="40dp"
-                    android:minWidth="80dp" />
+                    android:orientation="vertical"
+                    android:padding="28dp"
+                    android:background="?attr/colorOnBackground">
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/etEmail"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text=""
-                    android:textColor="?attr/colorOnSurface"
-                    android:textSize="16sp"
-                    android:background="@android:color/transparent"
-                    android:enabled="false"
-                    android:inputType="textEmailAddress" />
-            </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
+                    <!-- Header de la sección -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="24dp">
 
-        <!-- Contraseña -->
-        <com.google.android.material.card.MaterialCardView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="24dp"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="4dp"
-            app:cardBackgroundColor="?attr/colorSurfaceVariant">
+                        <com.google.android.material.card.MaterialCardView
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            app:cardCornerRadius="24dp"
+                            app:cardElevation="4dp"
+                            app:cardBackgroundColor="?attr/colorPrimary">
 
-            <LinearLayout
+                            <ImageView
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:layout_gravity="center"
+                                android:src="@drawable/ic_profile"
+                                app:tint="@android:color/white" />
+                        </com.google.android.material.card.MaterialCardView>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Información Personal"
+                            android:textColor="?attr/colorOnSurface"
+                            android:textSize="20sp"
+                            android:textStyle="bold"
+                            android:fontFamily="sans-serif-medium"
+                            android:layout_marginStart="16dp" />
+                    </LinearLayout>
+
+                    <!-- Email con diseño mejorado -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="20dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Correo Electrónico"
+                            android:textColor="?attr/colorOnSurfaceVariant"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            android:fontFamily="sans-serif-medium"
+                            android:layout_marginBottom="8dp"
+                            android:textAllCaps="true"
+                            android:letterSpacing="0.05" />
+
+                        <TextView
+                            android:id="@+id/tvEmail"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="usuario@ejemplo.com"
+                            android:textColor="?attr/colorOnSurface"
+                            android:textSize="18sp"
+                            android:fontFamily="sans-serif"
+                            android:drawableStart="@drawable/ic_email"
+                            android:drawablePadding="12dp"
+                            app:drawableTint="?attr/colorPrimary"
+                            android:gravity="center_vertical"
+                            android:minHeight="48dp" />
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <!-- Sección de acciones -->
+            <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:padding="20dp"
-                android:gravity="center_vertical">
+                android:layout_marginBottom="24dp"
+                app:cardCornerRadius="24dp"
+                app:cardElevation="8dp"
+                app:cardBackgroundColor="?attr/colorSurface"
+                app:strokeWidth="1dp"
+                app:strokeColor="?attr/colorOutlineVariant">
 
-                <TextView
-                    android:layout_width="wrap_content"
+                <LinearLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Contraseña"
-                    android:textColor="?attr/colorOnSurface"
-                    android:textSize="18sp"
-                    android:textStyle="bold"
-                    android:layout_marginEnd="40dp"
-                    android:minWidth="80dp" />
+                    android:orientation="vertical"
+                    android:padding="28dp"
+                    android:background="?attr/colorOnBackground">
 
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/etPassword"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:background="@android:color/transparent"
-                    android:enabled="false"
-                    android:inputType="textPassword"
-                    android:text="****************"
-                    android:textColor="?attr/colorOnSurface"
-                    android:textSize="16sp" />
+                    <!-- Header de la sección -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="24dp">
 
-                <ImageView
-                    android:id="@+id/btnTogglePassword"
-                    android:layout_width="24dp"
-                    android:layout_height="24dp"
-                    android:src="@drawable/ic_visibility_off"
-                    app:tint="?attr/colorOutline"
-                    android:background="?attr/selectableItemBackgroundBorderless"
-                    android:padding="2dp"
-                    android:layout_marginStart="12dp" />
-            </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
+                        <com.google.android.material.card.MaterialCardView
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            app:cardCornerRadius="24dp"
+                            app:cardElevation="4dp"
+                            app:cardBackgroundColor="?attr/colorSecondary">
 
-        <!-- Botón cambiar contraseña -->
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnChangePassword"
-            style="?attr/materialButtonOutlinedStyle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Cambiar de contraseña"
-            android:textColor="?attr/colorPrimary"
-            android:textAllCaps="false"
-            android:layout_gravity="center"
-            app:icon="@drawable/ic_refresh"
-            app:iconTint="?attr/colorPrimary"
-            app:iconPadding="8dp"
-            app:cornerRadius="12dp"
-            android:paddingHorizontal="12dp"
-            android:paddingVertical="6dp" />
-    </LinearLayout>
+                            <ImageView
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:layout_gravity="center"
+                                android:src="@drawable/ic_settings"
+                                app:tint="@android:color/white" />
+                        </com.google.android.material.card.MaterialCardView>
 
-    <!-- Espacio inferior -->
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="80dp" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Configuración"
+                            android:textColor="?attr/colorOnSurface"
+                            android:textSize="20sp"
+                            android:textStyle="bold"
+                            android:fontFamily="sans-serif-medium"
+                            android:layout_marginStart="16dp" />
+                    </LinearLayout>
+
+                    <!-- Botones de acción mejorados -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:divider="@drawable/divider_transparent"
+                        android:showDividers="middle">
+
+                        <!-- Cambiar contraseña -->
+                        <com.google.android.material.card.MaterialCardView
+                            android:id="@+id/btnChangePassword"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="12dp"
+                            app:cardCornerRadius="16dp"
+                            app:cardElevation="2dp"
+                            app:cardBackgroundColor="?attr/colorSecondaryContainer"
+                            android:foreground="?attr/selectableItemBackground">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal"
+                                android:padding="20dp"
+                                android:gravity="center_vertical"
+                                android:background="?attr/colorOnBackground">
+
+                                <ImageView
+                                    android:layout_width="24dp"
+                                    android:layout_height="24dp"
+                                    android:src="@drawable/ic_visibility"
+                                    app:tint="?attr/colorOnSecondaryContainer" />
+
+                                <TextView
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:text="Cambiar Contraseña"
+                                    android:textColor="?attr/colorOnSecondaryContainer"
+                                    android:textSize="16sp"
+                                    android:textStyle="bold"
+                                    android:layout_marginStart="16dp" />
+
+                                <ImageView
+                                    android:layout_width="20dp"
+                                    android:layout_height="20dp"
+                                    android:src="@drawable/ic_arrow_right"
+                                    app:tint="?attr/colorOnSecondaryContainer" />
+                            </LinearLayout>
+                        </com.google.android.material.card.MaterialCardView>
+
+                        <!-- Cambiar tema -->
+                        <com.google.android.material.card.MaterialCardView
+                            android:id="@+id/btnChangeTheme"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            app:cardCornerRadius="16dp"
+                            app:cardElevation="2dp"
+                            app:cardBackgroundColor="?attr/colorTertiaryContainer"
+                            android:foreground="?attr/selectableItemBackground">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal"
+                                android:padding="20dp"
+                                android:gravity="center_vertical"
+                                android:background="?attr/colorOnBackground">
+
+                                <ImageView
+                                    android:layout_width="24dp"
+                                    android:layout_height="24dp"
+                                    android:src="@drawable/ic_palette"
+                                    app:tint="?attr/colorOnTertiaryContainer" />
+
+                                <TextView
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_weight="1"
+                                    android:text="Cambiar Tema"
+                                    android:textColor="?attr/colorOnTertiaryContainer"
+                                    android:textSize="16sp"
+                                    android:textStyle="bold"
+                                    android:layout_marginStart="16dp" />
+
+                                <ImageView
+                                    android:layout_width="20dp"
+                                    android:layout_height="20dp"
+                                    android:src="@drawable/ic_arrow_right"
+                                    app:tint="?attr/colorOnTertiaryContainer" />
+                            </LinearLayout>
+                        </com.google.android.material.card.MaterialCardView>
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
 </LinearLayout>

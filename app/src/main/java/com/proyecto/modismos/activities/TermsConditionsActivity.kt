@@ -45,6 +45,7 @@ class TermsConditionsActivity : AppCompatActivity() {
             resultIntent.putExtra("checkTerms", currentCheckState)
             setResult(RESULT_OK, resultIntent)
             finish()
+
         }
 
         // "Aceptar": vuelve marcando el checkbox como true

@@ -1,5 +1,6 @@
 package com.proyecto.modismos.activities
 
+import android.app.ActivityOptions
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
@@ -27,13 +28,17 @@ class WelcomeActivity : AppCompatActivity() {
         // Redirigir a la pantalla de login
         loginButton.setOnClickListener {
             val intent = Intent(this, LoginActivity::class.java)
-            startActivity(intent)
+            val options = ActivityOptions
+                .makeCustomAnimation(this, R.anim.fade_in, R.anim.fade_out)
+            startActivity(intent, options.toBundle())
         }
 
         // Redirigir a la pantalla de crear cuenta
         signupLink.setOnClickListener {
             val intent = Intent(this, RegisterActivity::class.java)
-            startActivity(intent)
+            val options = ActivityOptions
+                .makeCustomAnimation(this, R.anim.fade_in, R.anim.fade_out)
+            startActivity(intent, options.toBundle())
         }
     }
 

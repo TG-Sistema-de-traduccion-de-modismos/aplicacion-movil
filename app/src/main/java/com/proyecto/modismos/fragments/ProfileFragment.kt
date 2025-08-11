@@ -2,31 +2,30 @@ package com.proyecto.modismos.fragments
 
 import android.content.Intent
 import android.os.Bundle
-import android.text.InputType
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
-import com.google.android.material.button.MaterialButton
+import com.google.android.material.card.MaterialCardView
 import com.google.android.material.textfield.TextInputEditText
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.EmailAuthProvider
 import com.proyecto.modismos.activities.LoginActivity
 import com.proyecto.modismos.R
+import com.proyecto.modismos.utils.ThemeHelper
 
 class ProfileFragment : Fragment() {
 
-    private lateinit var etEmail: TextInputEditText
-    private lateinit var etPassword: TextInputEditText
-    private lateinit var btnTogglePassword: ImageView
-    private lateinit var btnChangePassword: MaterialButton
+    private lateinit var tvEmail: TextView
+    private lateinit var btnChangePassword: MaterialCardView
+    private lateinit var btnChangeTheme: MaterialCardView
     private lateinit var btnLogout: ImageView
-
     private lateinit var auth: FirebaseAuth
-    private var isPasswordVisible = false
+    private lateinit var themeHelper: ThemeHelper
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -40,6 +39,7 @@ class ProfileFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         auth = FirebaseAuth.getInstance()
+        themeHelper = ThemeHelper(requireContext())
 
         initViews(view)
         setupClickListeners()
@@ -47,20 +47,19 @@ class ProfileFragment : Fragment() {
     }
 
     private fun initViews(view: View) {
-        etEmail = view.findViewById(R.id.etEmail)
-        etPassword = view.findViewById(R.id.etPassword)
-        btnTogglePassword = view.findViewById(R.id.btnTogglePassword)
+        tvEmail = view.findViewById(R.id.tvEmail)
         btnChangePassword = view.findViewById(R.id.btnChangePassword)
+        btnChangeTheme = view.findViewById(R.id.btnChangeTheme)
         btnLogout = view.findViewById(R.id.btnLogout)
     }
 
     private fun setupClickListeners() {
-        btnTogglePassword.setOnClickListener {
-            togglePasswordVisibility()
-        }
-
         btnChangePassword.setOnClickListener {
             showChangePasswordDialog()
+        }
+
+        btnChangeTheme.setOnClickListener {
+            showThemeSelectionDialog()
         }
 
         btnLogout.setOnClickListener {
@@ -70,35 +69,49 @@ class ProfileFragment : Fragment() {
 
     private fun setupUserData() {
         val currentUser = auth.currentUser
-
         if (currentUser != null) {
-            etEmail.setText(currentUser.email)
-            etPassword.setText("********")
+            tvEmail.text = currentUser.email ?: "Sin email"
         } else {
             redirectToLogin()
         }
-
-        etEmail.isEnabled = false
-        etPassword.isEnabled = false
     }
 
-    private fun togglePasswordVisibility() {
-        if (isPasswordVisible) {
-            etPassword.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_PASSWORD
-            btnTogglePassword.setImageResource(R.drawable.ic_visibility_off)
-            etPassword.setText("********")
-        } else {
-            etPassword.inputType = InputType.TYPE_CLASS_TEXT or InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD
-            btnTogglePassword.setImageResource(R.drawable.ic_visibility)
-            etPassword.setText("Oculta por seguridad")
-        }
-        isPasswordVisible = !isPasswordVisible
-        etPassword.setSelection(etPassword.text?.length ?: 0)
+    private fun showThemeSelectionDialog() {
+        val themes = arrayOf("Claro", "Oscuro", "Automático")
+        val currentTheme = themeHelper.getSavedTheme()
+
+        // Debug - Verificar valor actual
+        println("DEBUG: Tema actual guardado: $currentTheme")
+
+        val dialog = AlertDialog.Builder(requireContext())
+            .setTitle("Seleccionar Tema")
+            .setSingleChoiceItems(themes, currentTheme) { dialogInterface, which ->
+                println("DEBUG: Usuario seleccionó: $which")
+
+                // Mostrar mensaje según la selección
+                val themeMessage = when (which) {
+                    ThemeHelper.THEME_LIGHT -> "Tema claro aplicado"
+                    ThemeHelper.THEME_DARK -> "Tema oscuro aplicado"
+                    ThemeHelper.THEME_AUTO -> "Tema automático aplicado"
+                    else -> "Tema aplicado"
+                }
+
+                // Aplicar el tema
+                themeHelper.saveAndApplyTheme(which)
+                Toast.makeText(requireContext(), themeMessage, Toast.LENGTH_SHORT).show()
+
+                dialogInterface.dismiss()
+            }
+            .setNegativeButton("Cancelar") { dialogInterface, _ ->
+                dialogInterface.dismiss()
+            }
+            .create()
+
+        dialog.show()
     }
 
     private fun showChangePasswordDialog() {
         val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_change_password, null)
-
         val etCurrentPassword = dialogView.findViewById<TextInputEditText>(R.id.etCurrentPassword)
         val etNewPassword = dialogView.findViewById<TextInputEditText>(R.id.etNewPassword)
         val etConfirmNewPassword = dialogView.findViewById<TextInputEditText>(R.id.etConfirmNewPassword)
@@ -110,7 +123,6 @@ class ProfileFragment : Fragment() {
                 val currentPassword = etCurrentPassword.text.toString()
                 val newPassword = etNewPassword.text.toString()
                 val confirmNewPassword = etConfirmNewPassword.text.toString()
-
                 changePassword(currentPassword, newPassword, confirmNewPassword)
             }
             .setNegativeButton("Cancelar", null)
@@ -123,17 +135,14 @@ class ProfileFragment : Fragment() {
             Toast.makeText(requireContext(), "Ingresa tu contraseña actual", Toast.LENGTH_SHORT).show()
             return
         }
-
         if (newPassword.isEmpty()) {
             Toast.makeText(requireContext(), "Ingresa la nueva contraseña", Toast.LENGTH_SHORT).show()
             return
         }
-
         if (newPassword.length < 6) {
             Toast.makeText(requireContext(), "La nueva contraseña debe tener al menos 6 caracteres", Toast.LENGTH_SHORT).show()
             return
         }
-
         if (newPassword != confirmNewPassword) {
             Toast.makeText(requireContext(), "Las contraseñas no coinciden", Toast.LENGTH_SHORT).show()
             return
@@ -147,7 +156,6 @@ class ProfileFragment : Fragment() {
 
         // Reautenticar al usuario antes de cambiar la contraseña
         val credential = EmailAuthProvider.getCredential(currentUser.email!!, currentPassword)
-
         currentUser.reauthenticate(credential)
             .addOnCompleteListener { reAuthTask ->
                 if (reAuthTask.isSuccessful) {
@@ -157,7 +165,7 @@ class ProfileFragment : Fragment() {
                             if (updateTask.isSuccessful) {
                                 Toast.makeText(requireContext(), "Contraseña actualizada exitosamente", Toast.LENGTH_SHORT).show()
                             } else {
-                                Toast.makeText(requireContext(), "Error al actualizar la contraseña", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(requireContext(), "Error al actualizar la contraseña: ${updateTask.exception?.message}", Toast.LENGTH_SHORT).show()
                             }
                         }
                 } else {
@@ -187,11 +195,5 @@ class ProfileFragment : Fragment() {
         val intent = Intent(requireContext(), LoginActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         startActivity(intent)
-    }
-
-    companion object {
-        fun newInstance(): ProfileFragment {
-            return ProfileFragment()
-        }
     }
 }

@@ -7,6 +7,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
+import com.google.android.flexbox.FlexboxLayout
 import com.proyecto.modismos.R
 
 class WordDetailActivity : AppCompatActivity() {
@@ -49,14 +50,12 @@ class WordDetailActivity : AppCompatActivity() {
         }
 
         // Configurar sinónimos con nuevo diseño
-        val sinonimosContainer = findViewById<LinearLayout>(R.id.sinonimos_container)
+        val sinonimosContainer = findViewById<FlexboxLayout>(R.id.sinonimos_container)
         sinonimos.forEach { sinonimo ->
             val sinonimoView = LayoutInflater.from(this)
                 .inflate(R.layout.item_sinonimo, sinonimosContainer, false)
-
             val textView = sinonimoView.findViewById<TextView>(R.id.tv_sinonimo)
             textView.text = sinonimo
-
             sinonimosContainer.addView(sinonimoView)
         }
     }
@@ -79,4 +78,6 @@ class WordDetailActivity : AppCompatActivity() {
             finish()
         }
     }
+
+
 }

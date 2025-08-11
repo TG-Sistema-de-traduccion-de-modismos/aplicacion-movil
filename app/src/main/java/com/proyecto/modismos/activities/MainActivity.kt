@@ -1,5 +1,6 @@
 package com.proyecto.modismos.activities
 
+import android.app.ActivityOptions
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
@@ -43,7 +44,9 @@ class MainActivity : AppCompatActivity() {
         // verificar si la sesión está activa o no
 
         val intent = Intent(this, WelcomeActivity::class.java)
-        startActivity(intent)
+        val options = ActivityOptions
+            .makeCustomAnimation(this, R.anim.fade_in, R.anim.fade_out)
+        startActivity(intent, options.toBundle())
         finish()
     }
 }

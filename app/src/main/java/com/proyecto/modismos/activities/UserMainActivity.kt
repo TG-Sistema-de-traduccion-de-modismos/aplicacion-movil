@@ -1,92 +1,85 @@
 package com.proyecto.modismos.activities
 
 import android.app.AlertDialog
+import android.content.Context
 import android.os.Bundle
+import android.util.DisplayMetrics
 import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
-import androidx.fragment.app.Fragment
-import com.proyecto.modismos.fragments.*
+import androidx.recyclerview.widget.LinearSmoothScroller
+import androidx.recyclerview.widget.RecyclerView
+import androidx.viewpager2.widget.ViewPager2
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.proyecto.modismos.R
-
+import com.proyecto.modismos.adapters.MainPagerAdapter
 
 class UserMainActivity : AppCompatActivity() {
 
     private lateinit var bottomNavigationView: BottomNavigationView
+    private lateinit var viewPager: ViewPager2
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_user_main)
 
         supportActionBar?.hide()
-        bottomNavigationView = findViewById(R.id.bottom_navigation)
-
         setupTransparentBars()
 
+        bottomNavigationView = findViewById(R.id.bottom_navigation)
+        viewPager = findViewById(R.id.viewPager)
 
-        val targetFragment = intent.getIntExtra("fragment", R.id.nav_home)
+        viewPager.adapter = MainPagerAdapter(this)
+        viewPager.isUserInputEnabled = true // swipe manual habilitado
 
-        val fragment = when (targetFragment) {
-            R.id.nav_dictionary -> DictionaryFragment()
-            R.id.nav_profile -> ProfileFragment()
-            else -> HomeFragment()
-        }
+        // --- Selección inicial: Home en el centro ---
+        viewPager.setCurrentItem(1, false)
+        bottomNavigationView.selectedItemId = R.id.nav_home
 
-
-        supportFragmentManager.beginTransaction()
-            .replace(R.id.fragment_container, fragment)
-            .commit()
-
-        bottomNavigationView.selectedItemId = targetFragment
-
-        // Listener de navegación
+        // --- Menú inferior → ViewPager (animación suave tipo WhatsApp) ---
         bottomNavigationView.setOnItemSelectedListener { item ->
-            val fragment: Fragment = when (item.itemId) {
-                R.id.nav_home -> HomeFragment()
-                R.id.nav_dictionary -> DictionaryFragment()
-                R.id.nav_profile -> ProfileFragment()
-                else -> return@setOnItemSelectedListener false
+            when (item.itemId) {
+                R.id.nav_dictionary -> viewPager.setCurrentItem(0, false)
+                R.id.nav_home -> viewPager.setCurrentItem(1, false)
+                R.id.nav_profile -> viewPager.setCurrentItem(2, false)
             }
-
-            supportFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, fragment)
-                .commit()
-
             true
         }
 
-        // Ahora, después de establecer el listener, selecciona el ítem:
-        bottomNavigationView.selectedItemId = targetFragment
+        // --- ViewPager → Menú inferior ---
+        viewPager.registerOnPageChangeCallback(object : ViewPager2.OnPageChangeCallback() {
+            override fun onPageSelected(position: Int) {
+                when (position) {
+                    0 -> bottomNavigationView.selectedItemId = R.id.nav_dictionary
+                    1 -> bottomNavigationView.selectedItemId = R.id.nav_home
+                    2 -> bottomNavigationView.selectedItemId = R.id.nav_profile
+                }
+            }
+        })
 
+        // --- Botón atrás → diálogo de salida ---
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 showExitDialog()
             }
         })
-
     }
+
     private fun showExitDialog() {
         AlertDialog.Builder(this)
             .setTitle("¿Salir de la app?")
             .setMessage("¿Estás seguro de que quieres salir?")
-            .setPositiveButton("Sí") { _, _ ->
-                finishAffinity() // Cierra completamente la app
-            }
+            .setPositiveButton("Sí") { _, _ -> finishAffinity() }
             .setNegativeButton("No", null)
             .show()
     }
 
-
     private fun setupTransparentBars() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
-
         val insetsController = WindowCompat.getInsetsController(window, window.decorView)
-
         val isNightMode = (resources.configuration.uiMode and
                 android.content.res.Configuration.UI_MODE_NIGHT_MASK) ==
                 android.content.res.Configuration.UI_MODE_NIGHT_YES
-
         insetsController.isAppearanceLightStatusBars = !isNightMode
         insetsController.isAppearanceLightNavigationBars = !isNightMode
     }

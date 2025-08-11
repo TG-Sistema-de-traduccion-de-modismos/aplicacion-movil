@@ -166,7 +166,7 @@ class HomeFragment : Fragment() {
         )
 
         parentFragmentManager.beginTransaction()
-            .replace(R.id.fragment_container, analysisFragment)
+            .replace(R.id.viewPager, analysisFragment)
             .addToBackStack(null)
             .commit()
     }
@@ -189,7 +189,7 @@ class HomeFragment : Fragment() {
         )
 
         parentFragmentManager.beginTransaction()
-            .replace(R.id.fragment_container, analysisFragment)
+            .replace(R.id.viewPager, analysisFragment)
             .addToBackStack(null)
             .commit()
     }

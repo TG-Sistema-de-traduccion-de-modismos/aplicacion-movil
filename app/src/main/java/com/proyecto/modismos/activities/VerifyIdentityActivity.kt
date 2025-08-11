@@ -1,5 +1,6 @@
 package com.proyecto.modismos.activities
 
+import android.app.ActivityOptions
 import android.content.Intent
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
@@ -43,7 +44,9 @@ class VerifyIdentityActivity : AppCompatActivity() {
     private fun goToHome() {
         val intent = Intent(this, UserMainActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        startActivity(intent)
+        val options = ActivityOptions
+            .makeCustomAnimation(this, R.anim.fade_in, R.anim.fade_out)
+        startActivity(intent, options.toBundle())
     }
 
 

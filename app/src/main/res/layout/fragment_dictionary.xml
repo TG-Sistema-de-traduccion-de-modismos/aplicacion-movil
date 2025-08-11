@@ -38,7 +38,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Aquí puedes ver todos los modismos que\nhemos detectado en tus conversaciones."
-                android:textColor="?attr/colorSurface"
+                android:textColor="?attr/colorOnPrimary"
                 android:textSize="14sp"
                 android:layout_marginTop="4dp"
                 android:alpha="0.9"
@@ -48,18 +48,80 @@
 
     </RelativeLayout>
 
-    <!-- RecyclerView para la lista de palabras -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rv_modismos"
+    <!-- Contenedor para el contenido principal -->
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
-        android:paddingStart="24dp"
-        android:paddingEnd="24dp"
-        android:paddingTop="24dp"
-        android:paddingBottom="16dp"
-        android:clipToPadding="false"
-        android:scrollbars="none" />
+        android:layout_weight="1">
 
+        <!-- RecyclerView para la lista de palabras -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rv_modismos"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingStart="24dp"
+            android:paddingEnd="24dp"
+            android:paddingTop="24dp"
+            android:paddingBottom="16dp"
+            android:clipToPadding="false"
+            android:scrollbars="none" />
+
+        <!-- ProgressBar para mostrar estado de carga -->
+        <ProgressBar
+            android:id="@+id/progress_bar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:visibility="gone"
+            android:indeterminateTint="@color/red_primary" />
+
+        <!-- Contenedor para estado vacío -->
+        <LinearLayout
+            android:id="@+id/empty_state_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:padding="32dp"
+            android:visibility="gone">
+
+            <!-- Ícono para estado vacío -->
+            <ImageView
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:src="@drawable/ic_book_outline"
+                android:layout_marginBottom="16dp"
+                android:alpha="0.6"
+                app:tint="?attr/colorOnBackground" />
+
+            <!-- Texto principal del estado vacío -->
+            <TextView
+                android:id="@+id/tv_empty_state"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="¡Descubre palabras jugando para llenar tu diccionario!"
+                android:textSize="18sp"
+                android:textColor="?attr/colorOnSurface"
+                android:textAlignment="center"
+                android:gravity="center"
+                android:lineSpacingExtra="2dp"
+                android:layout_marginBottom="8dp"
+                android:fontFamily="sans-serif-medium" />
+
+            <!-- Texto secundario del estado vacío -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Las palabras que descubras aparecerán aquí con sus significados y sinónimos."
+                android:textSize="14sp"
+                android:textColor="?attr/colorOnSurface"
+                android:textAlignment="center"
+                android:gravity="center"
+                android:alpha="0.7"
+                android:lineSpacingExtra="2dp" />
+
+        </LinearLayout>
+
+    </FrameLayout>
 
 </LinearLayout>
