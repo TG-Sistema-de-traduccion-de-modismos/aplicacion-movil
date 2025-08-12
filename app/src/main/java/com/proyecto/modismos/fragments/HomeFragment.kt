@@ -22,6 +22,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.proyecto.modismos.activities.AudioRecorderActivity
+import com.proyecto.modismos.activities.AnalysisActivity
 import com.proyecto.modismos.R
 import com.proyecto.modismos.activities.UserMainActivity
 import java.io.File
@@ -103,7 +104,6 @@ class HomeFragment : Fragment() {
         etTexto = view.findViewById(R.id.etTexto)
         btnAnalizarTexto = view.findViewById(R.id.btnAnalizarTexto)
         btnAnalizarAudio = view.findViewById(R.id.btnAnalizarAudio)
-
     }
 
     private fun setupClickListeners() {
@@ -159,16 +159,8 @@ class HomeFragment : Fragment() {
             return
         }
 
-        // Navegar al AnalysisFragment con el texto
-        val analysisFragment = AnalysisFragment.newInstance(
-            type = AnalysisFragment.TYPE_TEXT,
-            content = texto
-        )
-
-        parentFragmentManager.beginTransaction()
-            .replace(R.id.viewPager, analysisFragment)
-            .addToBackStack(null)
-            .commit()
+        // Usar AnalysisActivity en lugar de AnalysisFragment
+        AnalysisActivity.startTextAnalysis(requireContext(), texto)
     }
 
     private fun analizarAudio() {
@@ -181,17 +173,8 @@ class HomeFragment : Fragment() {
         // En producción, esto debería enviarse a un servicio de transcripción
         val transcripcionSimulada = "oye viste el nuevo lugar que abrieron en el centro si fui ayer y esta bacano la comida y el ambiente es super chevere deberíamos ir un día de estos claro me avisas cuando puedes y cuadramos algo de una"
 
-        // Navegar al AnalysisFragment con la transcripción y el path del audio
-        val analysisFragment = AnalysisFragment.newInstance(
-            type = AnalysisFragment.TYPE_AUDIO,
-            content = transcripcionSimulada,
-            audioPath = recordedAudioPath
-        )
-
-        parentFragmentManager.beginTransaction()
-            .replace(R.id.viewPager, analysisFragment)
-            .addToBackStack(null)
-            .commit()
+        // Usar AnalysisActivity en lugar de AnalysisFragment
+        AnalysisActivity.startAudioAnalysis(requireContext(), transcripcionSimulada, recordedAudioPath!!)
     }
 
     private fun openAudioRecorder() {

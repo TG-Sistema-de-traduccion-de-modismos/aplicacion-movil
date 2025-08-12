@@ -1,46 +1,51 @@
-package com.proyecto.modismos.fragments
+package com.proyecto.modismos.activities
 
+import android.content.Context
+import android.content.Intent
 import android.media.MediaPlayer
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-import android.widget.ImageButton
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.SeekBar
 import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.WindowCompat
 import androidx.core.view.isVisible
-import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.button.MaterialButton
-import com.google.android.material.card.MaterialCardView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.proyecto.modismos.R
 import com.proyecto.modismos.adapters.ModismosAdapter
 import com.proyecto.modismos.models.Modismo
 
-class AnalysisFragment : Fragment() {
+class AnalysisActivity : AppCompatActivity() {
 
     companion object {
-        const val ARG_ANALYSIS_TYPE = "analysis_type"
-        const val ARG_TEXT_CONTENT = "text_content"
-        const val ARG_AUDIO_PATH = "audio_path"
+        private const val EXTRA_ANALYSIS_TYPE = "analysis_type"
+        private const val EXTRA_TEXT_CONTENT = "text_content"
+        private const val EXTRA_AUDIO_PATH = "audio_path"
 
         const val TYPE_TEXT = "text"
         const val TYPE_AUDIO = "audio"
 
-        fun newInstance(type: String, content: String, audioPath: String? = null): AnalysisFragment {
-            return AnalysisFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_ANALYSIS_TYPE, type)
-                    putString(ARG_TEXT_CONTENT, content)
-                    putString(ARG_AUDIO_PATH, audioPath)
-                }
+        fun startTextAnalysis(context: Context, textContent: String) {
+            val intent = Intent(context, AnalysisActivity::class.java).apply {
+                putExtra(EXTRA_ANALYSIS_TYPE, TYPE_TEXT)
+                putExtra(EXTRA_TEXT_CONTENT, textContent)
             }
+            context.startActivity(intent)
+        }
+
+        fun startAudioAnalysis(context: Context, textContent: String, audioPath: String) {
+            val intent = Intent(context, AnalysisActivity::class.java).apply {
+                putExtra(EXTRA_ANALYSIS_TYPE, TYPE_AUDIO)
+                putExtra(EXTRA_TEXT_CONTENT, textContent)
+                putExtra(EXTRA_AUDIO_PATH, audioPath)
+            }
+            context.startActivity(intent)
         }
     }
 
@@ -57,7 +62,7 @@ class AnalysisFragment : Fragment() {
     private var mediaPlayer: MediaPlayer? = null
     private var isPlaying = false
     private var updateHandler = Handler(Looper.getMainLooper())
-    private var  updateRunnable: Runnable? = null
+    private var updateRunnable: Runnable? = null
     private lateinit var modismosAdapter: ModismosAdapter
 
     private var analysisType: String = TYPE_TEXT
@@ -66,48 +71,44 @@ class AnalysisFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        arguments?.let {
-            analysisType = it.getString(ARG_ANALYSIS_TYPE, TYPE_TEXT)
-            textContent = it.getString(ARG_TEXT_CONTENT, "")
-            audioPath = it.getString(ARG_AUDIO_PATH)
-        }
-    }
+        setContentView(R.layout.activity_analysis)
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        return inflater.inflate(R.layout.fragment_analysis, container, false)
-    }
+        // Ocultar ActionBar y configurar barras transparentes
+        supportActionBar?.hide()
+        setupTransparentBars()
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        initViews(view)
+        // Obtener datos del intent
+        getIntentData()
+
+        // Inicializar vistas
+        initViews()
         setupClickListeners()
         setupRecyclerView()
         loadContent()
     }
 
-    private fun initViews(view: View) {
-        tvAnalysisTitle = view.findViewById(R.id.tvAnalysisTitle)
-        tvTextContent = view.findViewById(R.id.tvTextContent)
-        audioPlayerCard = view.findViewById(R.id.audioPlayerCard)
-        btnPlayPause = view.findViewById(R.id.btnPlayPause)
-        seekBarAudio = view.findViewById(R.id.seekBarAudio)
-        tvCurrentTime = view.findViewById(R.id.tvCurrentTime)
-        tvTotalTime = view.findViewById(R.id.tvTotalTime)
-        recyclerViewModismos = view.findViewById(R.id.recyclerViewModismos)
-        btnClose = view.findViewById(R.id.btn_close)
+    private fun getIntentData() {
+        analysisType = intent.getStringExtra(EXTRA_ANALYSIS_TYPE) ?: TYPE_TEXT
+        textContent = intent.getStringExtra(EXTRA_TEXT_CONTENT) ?: ""
+        audioPath = intent.getStringExtra(EXTRA_AUDIO_PATH)
+    }
+
+    private fun initViews() {
+        tvAnalysisTitle = findViewById(R.id.tvAnalysisTitle)
+        tvTextContent = findViewById(R.id.tvTextContent)
+        audioPlayerCard = findViewById(R.id.audioPlayerCard)
+        btnPlayPause = findViewById(R.id.btnPlayPause)
+        seekBarAudio = findViewById(R.id.seekBarAudio)
+        tvCurrentTime = findViewById(R.id.tvCurrentTime)
+        tvTotalTime = findViewById(R.id.tvTotalTime)
+        recyclerViewModismos = findViewById(R.id.recyclerViewModismos)
+        btnClose = findViewById(R.id.btn_close)
     }
 
     private fun setupClickListeners() {
-
-
         btnClose.setOnClickListener {
-            parentFragmentManager.popBackStack()
+            finish() // Cerrar la activity
         }
-
 
         btnPlayPause.setOnClickListener {
             togglePlayPause()
@@ -145,7 +146,7 @@ class AnalysisFragment : Fragment() {
 
         modismosAdapter = ModismosAdapter(modismosList)
         recyclerViewModismos.apply {
-            layoutManager = LinearLayoutManager(context)
+            layoutManager = LinearLayoutManager(this@AnalysisActivity)
             adapter = modismosAdapter
             isNestedScrollingEnabled = false
         }
@@ -183,7 +184,7 @@ class AnalysisFragment : Fragment() {
                     seekBarAudio.progress = 0
                     updateCurrentTime(0)
                     stopProgressUpdate()
-                    this@AnalysisFragment.isPlaying = false
+                    this@AnalysisActivity.isPlaying = false
                 }
 
                 setOnPreparedListener {
@@ -254,6 +255,16 @@ class AnalysisFragment : Fragment() {
         val minutes = totalSeconds / 60
         val seconds = totalSeconds % 60
         return String.format("%02d:%02d", minutes, seconds)
+    }
+
+    private fun setupTransparentBars() {
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+        val insetsController = WindowCompat.getInsetsController(window, window.decorView)
+        val isNightMode = (resources.configuration.uiMode and
+                android.content.res.Configuration.UI_MODE_NIGHT_MASK) ==
+                android.content.res.Configuration.UI_MODE_NIGHT_YES
+        insetsController.isAppearanceLightStatusBars = !isNightMode
+        insetsController.isAppearanceLightNavigationBars = !isNightMode
     }
 
     private fun releaseMediaPlayer() {
