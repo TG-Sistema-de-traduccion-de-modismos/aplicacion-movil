@@ -310,24 +310,30 @@ class AnalysisActivity : AppCompatActivity() {
             }
 
             override fun onResponse(call: Call, response: Response) {
-                runOnUiThread {
-                    isTranscribing = false
-                    showLoadingState(false)
+                try {
+                    val responseBody = response.body?.string() // leer inmediatamente
+                    runOnUiThread {
+                        isTranscribing = false
+                        showLoadingState(false)
 
-                    try {
                         if (response.isSuccessful) {
-                            val responseBody = response.body?.string()
                             responseBody?.let { body ->
                                 parseTranscriptionResponse(body)
                             } ?: showError("Respuesta vacía del servidor")
                         } else {
                             showError("Error del servidor: ${response.code}")
                         }
-                    } catch (e: Exception) {
+                    }
+                } catch (e: Exception) {
+                    runOnUiThread {
+                        isTranscribing = false
+                        showLoadingState(false)
                         showError("Error al procesar la respuesta: ${e.message}")
                     }
                 }
             }
+
+
         })
     }
 
