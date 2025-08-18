@@ -169,12 +169,8 @@ class HomeFragment : Fragment() {
             return
         }
 
-        // Aquí simularemos una transcripción del audio
-        // En producción, esto debería enviarse a un servicio de transcripción
-        val transcripcionSimulada = "oye viste el nuevo lugar que abrieron en el centro si fui ayer y esta bacano la comida y el ambiente es super chevere deberíamos ir un día de estos claro me avisas cuando puedes y cuadramos algo de una"
-
-        // Usar AnalysisActivity en lugar de AnalysisFragment
-        AnalysisActivity.startAudioAnalysis(requireContext(), transcripcionSimulada, recordedAudioPath!!)
+        // Iniciar el análisis de audio con transcripción automática
+        AnalysisActivity.startAudioAnalysisWithTranscription(requireContext(), recordedAudioPath!!)
     }
 
     private fun openAudioRecorder() {

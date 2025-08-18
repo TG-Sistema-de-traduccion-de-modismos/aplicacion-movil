@@ -63,38 +63,120 @@
             android:orientation="vertical"
             android:padding="24dp">
 
-            <!-- Título de sección -->
-            <TextView
-                android:id="@+id/tvAnalysisTitle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Texto ingresado"
-                android:textColor="?attr/colorOnSurface"
-                android:textSize="18sp"
-                android:textStyle="bold"
-                android:layout_marginBottom="16dp" />
-
-            <!-- Card del texto -->
+            <!-- Card del contenido con scroll -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
+                android:layout_height="150dp"
                 android:layout_marginBottom="20dp"
                 app:cardCornerRadius="12dp"
                 app:cardElevation="2dp"
                 app:cardBackgroundColor="?attr/colorSurface">
 
-                <TextView
-                    android:id="@+id/tvTextContent"
+                <FrameLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:padding="20dp"
-                    android:text=""
-                    android:textColor="?attr/colorOnSurface"
-                    android:textSize="16sp"
-                    android:lineSpacingExtra="4dp" />
+                    android:layout_height="match_parent">
+
+                    <!-- Contenido con scroll -->
+                    <androidx.core.widget.NestedScrollView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:paddingStart="20dp"
+                        android:paddingEnd="20dp"
+                        android:paddingTop="56dp"
+                        android:paddingBottom="20dp"
+                        android:scrollbars="vertical">
+
+                        <TextView
+                            android:id="@+id/tvTextContent"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text=""
+                            android:textColor="?attr/colorOnSurface"
+                            android:textSize="16sp"
+                            android:lineSpacingExtra="4dp" />
+                    </androidx.core.widget.NestedScrollView>
+
+                    <!-- Loading State -->
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:orientation="vertical"
+                        android:gravity="center">
+
+                        <com.google.android.material.progressindicator.CircularProgressIndicator
+                            android:id="@+id/progressIndicator"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:visibility="gone"
+                            app:indicatorColor="?attr/colorPrimary"
+                            app:trackColor="?attr/colorPrimaryContainer"
+                            app:indicatorSize="32dp"
+                            app:trackThickness="3dp"
+                            android:indeterminate="true" />
+
+                        <TextView
+                            android:id="@+id/tvLoadingMessage"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="12dp"
+                            android:text="Transcribiendo audio..."
+                            android:textColor="?attr/colorOnSurface"
+                            android:textSize="14sp"
+                            android:textStyle="bold"
+                            android:visibility="gone"
+                            android:gravity="center" />
+                    </LinearLayout>
+
+                    <!-- Botones de alternancia Original/Neutral flotando -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="top|end"
+                        android:layout_margin="12dp"
+                        app:cardCornerRadius="16dp"
+                        app:cardElevation="4dp"
+                        app:cardBackgroundColor="?attr/colorSurfaceVariant">
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="32dp"
+                            android:orientation="horizontal"
+                            android:padding="2dp">
+
+                            <TextView
+                                android:id="@+id/btnOriginal"
+                                android:layout_width="60dp"
+                                android:layout_height="28dp"
+                                android:text="Original"
+                                android:textColor="?attr/colorOnPrimary"
+                                android:textSize="10sp"
+                                android:textStyle="bold"
+                                android:gravity="center"
+                                android:background="@drawable/toggle_button_selected"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:layout_marginEnd="2dp" />
+
+                            <TextView
+                                android:id="@+id/btnNeutral"
+                                android:layout_width="60dp"
+                                android:layout_height="28dp"
+                                android:text="Neutral"
+                                android:textColor="?attr/colorOnSurfaceVariant"
+                                android:textSize="10sp"
+                                android:textStyle="bold"
+                                android:gravity="center"
+                                android:background="@drawable/toggle_button_unselected"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:layout_marginStart="2dp" />
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+                </FrameLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Reproductor de Audio -->
+            <!-- 🔽 Reproductor de Audio (movido debajo del CardView) -->
             <LinearLayout
                 android:id="@+id/audioPlayerCard"
                 android:layout_width="match_parent"
