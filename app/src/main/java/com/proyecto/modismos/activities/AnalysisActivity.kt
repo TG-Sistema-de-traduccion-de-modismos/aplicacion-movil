@@ -42,7 +42,7 @@ class AnalysisActivity : AppCompatActivity() {
         const val TYPE_TEXT = "text"
         const val TYPE_AUDIO = "audio"
 
-        private const val WHISPER_SERVER_URL = "http://10.34.1.50:17041/transcribe"
+        private const val WHISPER_SERVER_URL = "https://9cfdc11dca24.ngrok-free.app/transcribe"
 
         fun startTextAnalysis(context: Context, textContent: String) {
             val intent = Intent(context, AnalysisActivity::class.java).apply {
