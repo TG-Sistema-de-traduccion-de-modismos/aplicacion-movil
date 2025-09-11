@@ -217,7 +217,6 @@ class DictionaryFragment : Fragment() {
         }
     }
 
-    // Método público para refrescar el diccionario (útil cuando se descubren nuevas palabras)
     fun refreshDictionary() {
         loadDiscoveredWords()
     }

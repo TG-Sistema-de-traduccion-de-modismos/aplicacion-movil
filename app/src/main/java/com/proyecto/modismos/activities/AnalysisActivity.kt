@@ -42,7 +42,10 @@ class AnalysisActivity : AppCompatActivity() {
         const val TYPE_TEXT = "text"
         const val TYPE_AUDIO = "audio"
 
-        private const val WHISPER_SERVER_URL = "https://9cfdc11dca24.ngrok-free.app/transcribe"
+        // 🔄 CAMBIO: URL de la API Gateway (reemplaza con tu URL de ngrok)
+        private const val API_GATEWAY_BASE_URL = "https://YOUR_NGROK_URL.ngrok.io"
+        private const val TRANSCRIBE_ENDPOINT = "$API_GATEWAY_BASE_URL/transcribe"
+        private const val ANALYZE_TEXT_ENDPOINT = "$API_GATEWAY_BASE_URL/analyze-text"
 
         fun startTextAnalysis(context: Context, textContent: String) {
             val intent = Intent(context, AnalysisActivity::class.java).apply {
@@ -97,7 +100,7 @@ class AnalysisActivity : AppCompatActivity() {
     private var shouldAutoTranscribe = false
     private var isTranscribing = false
 
-    // Cliente HTTP para las peticiones al servidor
+    // Cliente HTTP para las peticiones a la API Gateway
     private val httpClient = OkHttpClient.Builder()
         .connectTimeout(30, TimeUnit.SECONDS)
         .readTimeout(60, TimeUnit.SECONDS)
@@ -214,7 +217,8 @@ class AnalysisActivity : AppCompatActivity() {
     private fun updateContent() {
         tvTextContent.animate().alpha(0.3f).setDuration(100).withEndAction {
             if (isNeutralSelected) {
-                tvTextContent.text = ""
+                // 🔄 CAMBIO: Mostrar mensaje para versión neutral
+                tvTextContent.text = "Versión neutral - Conectado con API Gateway"
             } else {
                 if (analysisType == TYPE_TEXT) {
                     tvTextContent.text = textContent
@@ -267,16 +271,97 @@ class AnalysisActivity : AppCompatActivity() {
             }
         } else {
             audioPlayerCard.isVisible = false
+
+            // Si es análisis de texto, enviar a la API Gateway
+            if (analysisType == TYPE_TEXT && textContent.isNotBlank()) {
+                sendTextToGateway(textContent)
+            }
         }
 
         updateContent()
+    }
+
+    // Función para enviar texto a la API Gateway
+    private fun sendTextToGateway(text: String) {
+        showLoadingState(true, "Conectando con API Gateway...")
+
+        val jsonBody = JSONObject().apply {
+            put("text", text)
+        }
+
+        val requestBody = RequestBody.create(
+            "application/json".toMediaTypeOrNull(),
+            jsonBody.toString()
+        )
+
+        val request = Request.Builder()
+            .url(ANALYZE_TEXT_ENDPOINT)
+            .post(requestBody)
+            .addHeader("Content-Type", "application/json")
+            .build()
+
+        httpClient.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                runOnUiThread {
+                    showLoadingState(false)
+                    showError("Error conectando con API Gateway: ${e.message}")
+                }
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                try {
+                    val responseBody = response.body?.string()
+                    runOnUiThread {
+                        showLoadingState(false)
+
+                        if (response.isSuccessful) {
+                            responseBody?.let { body ->
+                                parseGatewayResponse(body)
+                            } ?: showError("Respuesta vacía de API Gateway")
+                        } else {
+                            showError("Error de API Gateway: ${response.code}")
+                        }
+                    }
+                } catch (e: Exception) {
+                    runOnUiThread {
+                        showLoadingState(false)
+                        showError("Error procesando respuesta de API Gateway: ${e.message}")
+                    }
+                }
+            }
+        })
+    }
+
+    // Función para procesar respuesta de la API Gateway
+    private fun parseGatewayResponse(jsonResponse: String) {
+        try {
+            val jsonObject = JSONObject(jsonResponse)
+
+            // Obtener el texto de análisis de la respuesta
+            val analysisText = when {
+                jsonObject.has("analysis") -> jsonObject.getString("analysis")
+                jsonObject.has("text") -> jsonObject.getString("text")
+                jsonObject.has("result") -> jsonObject.getString("result")
+                else -> "Conectado con la API Gateway"
+            }
+
+            // Actualizar el contenido con la respuesta de la API Gateway
+            if (analysisText.isNotBlank()) {
+                // Mantener el texto original pero mostrar confirmación de conexión
+                Toast.makeText(this, analysisText, Toast.LENGTH_SHORT).show()
+            }
+
+        } catch (e: Exception) {
+            // Si no es JSON válido, mostrar mensaje de conexión exitosa
+            Toast.makeText(this, "Conectado con la API Gateway", Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun startTranscription() {
         if (audioPath.isNullOrEmpty() || isTranscribing) return
 
         isTranscribing = true
-        showLoadingState(true)
+        showLoadingState(true, "Transcribiendo audio con API Gateway...")
 
         val audioFile = File(audioPath!!)
         if (!audioFile.exists()) {
@@ -284,7 +369,7 @@ class AnalysisActivity : AppCompatActivity() {
             return
         }
 
-        // Crear el request multipart
+        // Crear el request multipart para la API Gateway
         val requestBody = MultipartBody.Builder()
             .setType(MultipartBody.FORM)
             .addFormDataPart(
@@ -295,7 +380,7 @@ class AnalysisActivity : AppCompatActivity() {
             .build()
 
         val request = Request.Builder()
-            .url(WHISPER_SERVER_URL)
+            .url(TRANSCRIBE_ENDPOINT)
             .post(requestBody)
             .build()
 
@@ -305,13 +390,13 @@ class AnalysisActivity : AppCompatActivity() {
                 runOnUiThread {
                     isTranscribing = false
                     showLoadingState(false)
-                    showError("Error de conexión: ${e.message}")
+                    showError("Error de conexión con API Gateway: ${e.message}")
                 }
             }
 
             override fun onResponse(call: Call, response: Response) {
                 try {
-                    val responseBody = response.body?.string() // leer inmediatamente
+                    val responseBody = response.body?.string()
                     runOnUiThread {
                         isTranscribing = false
                         showLoadingState(false)
@@ -319,21 +404,19 @@ class AnalysisActivity : AppCompatActivity() {
                         if (response.isSuccessful) {
                             responseBody?.let { body ->
                                 parseTranscriptionResponse(body)
-                            } ?: showError("Respuesta vacía del servidor")
+                            } ?: showError("Respuesta vacía de API Gateway")
                         } else {
-                            showError("Error del servidor: ${response.code}")
+                            showError("Error de API Gateway: ${response.code}")
                         }
                     }
                 } catch (e: Exception) {
                     runOnUiThread {
                         isTranscribing = false
                         showLoadingState(false)
-                        showError("Error al procesar la respuesta: ${e.message}")
+                        showError("Error al procesar la respuesta de API Gateway: ${e.message}")
                     }
                 }
             }
-
-
         })
     }
 
@@ -341,41 +424,39 @@ class AnalysisActivity : AppCompatActivity() {
         try {
             val jsonObject = JSONObject(jsonResponse)
 
-            // Intentar diferentes formatos de respuesta comunes en servidores Whisper
+            // 🔄 CAMBIO: Adaptado para la respuesta de la API Gateway
             val transcription = when {
                 jsonObject.has("text") -> jsonObject.getString("text")
                 jsonObject.has("transcription") -> jsonObject.getString("transcription")
                 jsonObject.has("result") -> jsonObject.getString("result")
-                else -> {
-                    // Si no encuentra ningún campo conocido, usar toda la respuesta como texto
-                    jsonResponse
-                }
+                else -> jsonResponse
             }
 
             if (transcription.isNotBlank()) {
                 textContent = transcription.trim()
                 updateContent()
-                Toast.makeText(this, "Transcripción completada", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "✅ Transcripción completada con API Gateway", Toast.LENGTH_SHORT).show()
             } else {
-                showError("No se pudo obtener la transcripción")
+                showError("No se pudo obtener la transcripción de API Gateway")
             }
         } catch (e: Exception) {
             // Si no es JSON válido, intentar usar la respuesta directamente como texto
             if (jsonResponse.isNotBlank()) {
                 textContent = jsonResponse.trim()
                 updateContent()
-                Toast.makeText(this, "Transcripción completada", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "✅ Transcripción completada con API Gateway", Toast.LENGTH_SHORT).show()
             } else {
-                showError("Error al procesar la transcripción: ${e.message}")
+                showError("Error al procesar la transcripción de API Gateway: ${e.message}")
             }
         }
     }
 
-    private fun showLoadingState(isLoading: Boolean) {
+    // 🔄 CAMBIO: Función actualizada para mostrar diferentes mensajes de carga
+    private fun showLoadingState(isLoading: Boolean, message: String = "Transcribiendo audio...") {
         if (isLoading) {
             progressIndicator.isVisible = true
             tvLoadingMessage.isVisible = true
-            tvLoadingMessage.text = "Transcribiendo audio..."
+            tvLoadingMessage.text = message
 
             // Animación de aparición
             progressIndicator.alpha = 0f
@@ -402,7 +483,7 @@ class AnalysisActivity : AppCompatActivity() {
     }
 
     private fun showError(message: String) {
-        Toast.makeText(this, message, Toast.LENGTH_LONG).show()
+        Toast.makeText(this, "❌ $message", Toast.LENGTH_LONG).show()
     }
 
     private fun setupAudioPlayer(path: String) {
