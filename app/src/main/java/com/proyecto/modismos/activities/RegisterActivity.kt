@@ -17,6 +17,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException
+import com.google.firebase.firestore.FirebaseFirestore
 import com.proyecto.modismos.R
 
 class RegisterActivity : AppCompatActivity() {
@@ -30,6 +31,7 @@ class RegisterActivity : AppCompatActivity() {
     private lateinit var loginLinkTv: TextView
 
     private lateinit var auth: FirebaseAuth
+    private lateinit var firestore: FirebaseFirestore
 
     // Launcher para manejar el resultado de TermsConditionsActivity
     private val termsActivityLauncher = registerForActivityResult(
@@ -46,8 +48,9 @@ class RegisterActivity : AppCompatActivity() {
         setContentView(R.layout.activity_register)
         supportActionBar?.hide()
 
-        // Inicializar Firebase Auth
+        // Inicializar Firebase Auth y Firestore
         auth = FirebaseAuth.getInstance()
+        firestore = FirebaseFirestore.getInstance()
 
         setupTransparentBars()
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
@@ -106,25 +109,62 @@ class RegisterActivity : AppCompatActivity() {
         // Crear usuario con Firebase
         auth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener(this) { task ->
+                if (task.isSuccessful) {
+                    // Registro exitoso, ahora crear documento en Firestore
+                    val user = auth.currentUser
+                    user?.let { firebaseUser ->
+                        createUserInFirestore(firebaseUser.uid, email)
+                    } ?: run {
+                        createAccountBtn.isEnabled = true
+                        createAccountBtn.text = "Crear cuenta"
+                        Toast.makeText(this, "Error: Usuario no encontrado", Toast.LENGTH_SHORT).show()
+                    }
+                } else {
+                    // Error en el registro
+                    createAccountBtn.isEnabled = true
+                    createAccountBtn.text = "Crear cuenta"
+                    handleRegistrationError(task.exception)
+                }
+            }
+    }
+
+    private fun createUserInFirestore(userId: String, email: String) {
+        // Crear objeto usuario con lista vacía de palabras
+        val userData = hashMapOf(
+            "email" to email,
+            "palabras" to emptyList<String>()
+        )
+
+        // Guardar en la colección "usuarios" con el ID del usuario de Authentication
+        firestore.collection("usuarios").document(userId)
+            .set(userData)
+            .addOnSuccessListener {
+                // Usuario creado exitosamente en Firestore
                 createAccountBtn.isEnabled = true
                 createAccountBtn.text = "Crear cuenta"
 
-                if (task.isSuccessful) {
-                    // Registro exitoso
-                    val user = auth.currentUser
-                    Toast.makeText(this, "Cuenta creada exitosamente", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Cuenta creada exitosamente", Toast.LENGTH_SHORT).show()
 
-                    // Redirigir a VerifyIdentityActivity o directamente al MainActivity
-                    val intent = Intent(this, VerifyIdentityActivity::class.java)
-                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-                    val options = ActivityOptions
-                        .makeCustomAnimation(this, R.anim.fade_in, R.anim.fade_out)
-                    startActivity(intent, options.toBundle())
+                // Redirigir a VerifyIdentityActivity o directamente al MainActivity
+                val intent = Intent(this, VerifyIdentityActivity::class.java)
+                intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                val options = ActivityOptions
+                    .makeCustomAnimation(this, R.anim.fade_in, R.anim.fade_out)
+                startActivity(intent, options.toBundle())
+            }
+            .addOnFailureListener { exception ->
+                // Error al crear el documento en Firestore
+                createAccountBtn.isEnabled = true
+                createAccountBtn.text = "Crear cuenta"
 
-                } else {
-                    // Error en el registro
-                    handleRegistrationError(task.exception)
-                }
+                Toast.makeText(
+                    this,
+                    "Error al crear perfil de usuario: ${exception.message}",
+                    Toast.LENGTH_LONG
+                ).show()
+
+                // Opcional: Eliminar el usuario de Authentication si falló Firestore
+                auth.currentUser?.delete()
             }
     }
 

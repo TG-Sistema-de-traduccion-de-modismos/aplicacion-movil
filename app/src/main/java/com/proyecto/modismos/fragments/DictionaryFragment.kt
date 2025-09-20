@@ -13,7 +13,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.Query
 import com.proyecto.modismos.R
 import com.proyecto.modismos.adapters.WordAdapter
 import com.proyecto.modismos.models.Modismo
@@ -43,6 +42,10 @@ class DictionaryFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         initViews(view)
         setupRecyclerView()
+    }
+
+    override fun onResume() {
+        super.onResume()
         loadDiscoveredWords()
     }
 
@@ -77,6 +80,8 @@ class DictionaryFragment : Fragment() {
             setHasFixedSize(true)
         }
     }
+
+
 
     private fun loadDiscoveredWords() {
         val currentUser = auth.currentUser
@@ -116,11 +121,19 @@ class DictionaryFragment : Fragment() {
     }
 
     private fun loadWordDetails(wordNames: List<String>) {
+        if (!isAdded) return // Verificar que el fragment esté adjunto
+
         discoveredWords.clear()
 
         // Usar un contador para saber cuándo terminar de cargar todas las palabras
         var loadedCount = 0
         val totalWords = wordNames.size
+
+        if (totalWords == 0) {
+            showLoading(false)
+            updateUI()
+            return
+        }
 
         wordNames.forEach { wordName ->
             db.collection("palabras")
@@ -128,7 +141,7 @@ class DictionaryFragment : Fragment() {
                 .limit(1)
                 .get()
                 .addOnSuccessListener { documents ->
-                    if (!documents.isEmpty) {
+                    if (!documents.isEmpty && isAdded) {
                         val doc = documents.documents[0]
                         val significados = doc.get("significados") as? List<String> ?: emptyList()
                         val sinonimos = doc.get("sinonimos") as? List<String> ?: emptyList()
@@ -146,7 +159,7 @@ class DictionaryFragment : Fragment() {
                     loadedCount++
 
                     // Cuando se hayan cargado todas las palabras, actualizar la UI
-                    if (loadedCount == totalWords) {
+                    if (loadedCount == totalWords && isAdded) {
                         showLoading(false)
                         updateUI()
                     }
@@ -155,7 +168,7 @@ class DictionaryFragment : Fragment() {
                     Log.e("DictionaryFragment", "Error loading word: $wordName", exception)
                     loadedCount++
 
-                    if (loadedCount == totalWords) {
+                    if (loadedCount == totalWords && isAdded) {
                         showLoading(false)
                         updateUI()
                     }
@@ -164,6 +177,8 @@ class DictionaryFragment : Fragment() {
     }
 
     private fun updateUI() {
+        if (!isAdded) return // Verificar que el fragment esté adjunto
+
         if (discoveredWords.isEmpty()) {
             showEmptyState("¡Descubre palabras jugando para llenar tu diccionario!")
         } else {
@@ -178,11 +193,16 @@ class DictionaryFragment : Fragment() {
                 emptyStateContainer.visibility = View.GONE
             }
 
-            adapter.notifyDataSetChanged()
+            // Notificar cambios en el adapter
+            if (::adapter.isInitialized) {
+                adapter.notifyDataSetChanged()
+            }
         }
     }
 
     private fun showLoading(show: Boolean) {
+        if (!isAdded) return
+
         // Solo mostrar/ocultar si los elementos existen en el layout
         if (::progressBar.isInitialized && progressBar.parent != null) {
             progressBar.visibility = if (show) View.VISIBLE else View.GONE
@@ -198,6 +218,8 @@ class DictionaryFragment : Fragment() {
     }
 
     private fun showEmptyState(message: String) {
+        if (!isAdded) return
+
         if (::recyclerView.isInitialized) {
             recyclerView.visibility = View.GONE
         }
