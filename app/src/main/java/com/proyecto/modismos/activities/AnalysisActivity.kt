@@ -50,7 +50,7 @@ class AnalysisActivity : AppCompatActivity() {
         const val TYPE_AUDIO = "audio"
 
         // CAMBIO: URL de la API Gateway actualizada (reemplaza con tu URL de ngrok)
-        private const val API_GATEWAY_BASE_URL = "https://09a1faf165e5.ngrok-free.app"
+        private const val API_GATEWAY_BASE_URL = "https://7f996d9a6f67.ngrok-free.app"
         private const val TRANSCRIBE_ENDPOINT = "$API_GATEWAY_BASE_URL/transcribe"
         private const val ANALYZE_TEXT_ENDPOINT = "$API_GATEWAY_BASE_URL/analyze-text"
         private const val ANALYZE_AUDIO_ENDPOINT = "$API_GATEWAY_BASE_URL/analyze-audio"
@@ -111,6 +111,8 @@ class AnalysisActivity : AppCompatActivity() {
     // Variables para almacenar las respuestas completas
     private var lastApiResponse: String = ""
     private var detectedModismos: List<Modismo> = emptyList()
+
+    private var neutralizedSentence: String = ""
 
     // Cliente HTTP para las peticiones a la API Gateway
     private val httpClient = OkHttpClient.Builder()
@@ -248,7 +250,7 @@ class AnalysisActivity : AppCompatActivity() {
         tvTextContent.animate().alpha(0.3f).setDuration(100).withEndAction {
             if (isNeutralSelected) {
                 // Mostrar versión neutral basada en la respuesta de BETO
-                tvTextContent.text = generateNeutralText()
+                tvTextContent.text = neutralizedSentence
             } else {
                 if (analysisType == TYPE_TEXT) {
                     tvTextContent.text = textContent
@@ -263,10 +265,6 @@ class AnalysisActivity : AppCompatActivity() {
             }
             tvTextContent.animate().alpha(1.0f).setDuration(150).start()
         }.start()
-    }
-
-    private fun generateNeutralText(): String {
-        return ("Versión neutral")
     }
 
     private fun setupRecyclerView() {
@@ -593,6 +591,15 @@ class AnalysisActivity : AppCompatActivity() {
 
             // Mostrar información adicional
             val totalModismos = jsonObject.optInt("total_modismos", 0)
+
+            if (jsonObject.has("frase_neutral")){
+                neutralizedSentence = jsonObject.getString("frase_neutral")
+            }
+            else {
+                neutralizedSentence = ""
+            }
+
+
             val message = when {
                 totalModismos > 0 -> "Pipeline completo: $totalModismos modismos detectados"
                 transcription.isNotBlank() -> "Transcripción completada (sin modismos detectados)"
@@ -669,6 +676,13 @@ class AnalysisActivity : AppCompatActivity() {
                 }
             } else {
                 "(BETO no disponible)"
+            }
+
+            if (jsonObject.has("frase_neutral")){
+                neutralizedSentence = jsonObject.getString("frase_neutral")
+            }
+            else {
+                neutralizedSentence = ""
             }
 
             Toast.makeText(this, message, Toast.LENGTH_LONG).show()
