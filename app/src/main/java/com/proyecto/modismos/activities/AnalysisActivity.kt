@@ -36,6 +36,11 @@ import java.io.File
 import java.io.IOException
 import java.util.concurrent.TimeUnit
 import java.util.Locale
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.style.BackgroundColorSpan
+import android.text.style.ForegroundColorSpan
+import androidx.core.content.ContextCompat
 
 class AnalysisActivity : AppCompatActivity() {
 
@@ -45,12 +50,9 @@ class AnalysisActivity : AppCompatActivity() {
         private const val EXTRA_TEXT_CONTENT = "text_content"
         private const val EXTRA_AUDIO_PATH = "audio_path"
         private const val EXTRA_AUTO_TRANSCRIBE = "auto_transcribe"
-
         const val TYPE_TEXT = "text"
         const val TYPE_AUDIO = "audio"
-
-        // CAMBIO: URL de la API Gateway actualizada (reemplaza con tu URL de ngrok)
-        private const val API_GATEWAY_BASE_URL = "https://7f996d9a6f67.ngrok-free.app"
+        private const val API_GATEWAY_BASE_URL = "https://69c29c7e125b.ngrok-free.app"
         private const val TRANSCRIBE_ENDPOINT = "$API_GATEWAY_BASE_URL/transcribe"
         private const val ANALYZE_TEXT_ENDPOINT = "$API_GATEWAY_BASE_URL/analyze-text"
         private const val ANALYZE_AUDIO_ENDPOINT = "$API_GATEWAY_BASE_URL/analyze-audio"
@@ -249,22 +251,72 @@ class AnalysisActivity : AppCompatActivity() {
     private fun updateContent() {
         tvTextContent.animate().alpha(0.3f).setDuration(100).withEndAction {
             if (isNeutralSelected) {
-                // Mostrar versión neutral basada en la respuesta de BETO
+                // Mostrar versión neutral sin resaltado
                 tvTextContent.text = neutralizedSentence
             } else {
+                // Mostrar versión original con palabras resaltadas
                 if (analysisType == TYPE_TEXT) {
-                    tvTextContent.text = textContent
+                    tvTextContent.text = highlightDetectedWords(textContent)
                 } else {
-                    // Para audio, mostrar la transcripción o un mensaje
+                    // Para audio, mostrar la transcripción
                     if (isTranscribing) {
                         tvTextContent.text = ""
                     } else {
-                        tvTextContent.text = textContent
+                        tvTextContent.text = highlightDetectedWords(textContent)
                     }
                 }
             }
             tvTextContent.animate().alpha(1.0f).setDuration(150).start()
         }.start()
+    }
+
+    private fun highlightDetectedWords(text: String): SpannableString {
+        val spannable = SpannableString(text)
+
+        if (detectedModismos.isEmpty() || text.isBlank()) {
+            return spannable
+        }
+
+        // Color para el texto de las palabras detectadas
+        val highlightColor = ContextCompat.getColor(this, R.color.highlight_word)
+
+        // Recorrer cada modismo detectado
+        for (modismo in detectedModismos) {
+            val palabra = modismo.palabra
+
+            // Buscar todas las ocurrencias de la palabra (case insensitive)
+            var startIndex = 0
+            val textLower = text.lowercase()
+            val palabraLower = palabra.lowercase()
+
+            while (startIndex < text.length) {
+                val index = textLower.indexOf(palabraLower, startIndex)
+                if (index == -1) break
+
+                val endIndex = index + palabra.length
+
+                // Aplicar color del texto
+                spannable.setSpan(
+                    ForegroundColorSpan(highlightColor),
+                    index,
+                    endIndex,
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+
+                // Aplicar negrita
+                spannable.setSpan(
+                    android.text.style.StyleSpan(android.graphics.Typeface.BOLD),
+                    index,
+                    endIndex,
+                    Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                )
+
+                startIndex = endIndex
+            }
+        }
+
+        Log.d(TAG, "Texto resaltado con ${detectedModismos.size} palabras")
+        return spannable
     }
 
     private fun setupRecyclerView() {

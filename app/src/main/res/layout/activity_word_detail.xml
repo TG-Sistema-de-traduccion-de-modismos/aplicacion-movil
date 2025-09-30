@@ -111,7 +111,7 @@
                 android:layout_marginBottom="20dp"
                 app:cardCornerRadius="24dp"
                 app:cardElevation="8dp"
-                app:cardBackgroundColor="?attr/colorSurface"
+                app:cardBackgroundColor="?attr/colorOnBackground"
                 app:strokeWidth="1dp"
                 app:strokeColor="?attr/colorOutlineVariant">
 
@@ -172,7 +172,7 @@
                 android:layout_height="wrap_content"
                 app:cardCornerRadius="24dp"
                 app:cardElevation="8dp"
-                app:cardBackgroundColor="?attr/colorSurface"
+                app:cardBackgroundColor="?attr/colorOnBackground"
                 app:strokeWidth="1dp"
                 app:strokeColor="?attr/colorOutlineVariant">
 

@@ -9,10 +9,9 @@
     android:layout_marginBottom="16dp"
     app:cardCornerRadius="20dp"
     app:cardElevation="8dp"
-    app:cardBackgroundColor="@android:color/white"
+    app:cardBackgroundColor="?attr/colorOnBackground"
     android:clickable="true"
     android:focusable="true"
-    android:foreground="?android:attr/selectableItemBackground"
     app:rippleColor="@color/red_primary">
 
     <LinearLayout
@@ -26,7 +25,7 @@
         <View
             android:layout_width="6dp"
             android:layout_height="48dp"
-            android:background="@drawable/accent_line"
+            android:background="?attr/colorPrimary"
             android:layout_marginEnd="20dp" />
 
         <LinearLayout
@@ -40,7 +39,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="PALABRA"
-                android:textColor="#8E8E93"
+                android:textColor="?attr/colorOnSurface"
                 android:textSize="11sp"
                 android:textStyle="bold"
                 android:letterSpacing="0.15"
@@ -52,7 +51,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="palabra"
-                android:textColor="@color/red_primary"
+                android:textColor="?attr/colorPrimary"
                 android:textSize="22sp"
                 android:textStyle="bold"
                 android:letterSpacing="0.02" />
@@ -61,7 +60,7 @@
             <View
                 android:layout_width="40dp"
                 android:layout_height="2dp"
-                android:background="@color/red_primary"
+                android:background="?attr/colorPrimary"
                 android:alpha="0.3"
                 android:layout_marginTop="8dp" />
 

@@ -63,10 +63,11 @@
             android:orientation="vertical"
             android:padding="24dp">
 
-            <!-- Card del contenido con scroll -->
+            <!-- Card del contenido con altura dinámica -->
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
-                android:layout_height="150dp"
+                android:layout_height="wrap_content"
+                android:minHeight="150dp"
                 android:layout_marginBottom="20dp"
                 app:cardCornerRadius="12dp"
                 app:cardElevation="2dp"
@@ -74,12 +75,13 @@
 
                 <FrameLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent">
+                    android:layout_height="wrap_content">
 
                     <!-- Contenido con scroll -->
                     <androidx.core.widget.NestedScrollView
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
+                        android:layout_height="wrap_content"
+                        android:maxHeight="400dp"
                         android:paddingStart="20dp"
                         android:paddingEnd="20dp"
                         android:paddingTop="56dp"
@@ -102,7 +104,8 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
                         android:orientation="vertical"
-                        android:gravity="center">
+                        android:gravity="center"
+                        android:minHeight="150dp">
 
                         <com.google.android.material.progressindicator.CircularProgressIndicator
                             android:id="@+id/progressIndicator"
@@ -176,7 +179,7 @@
                 </FrameLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- 🔽 Reproductor de Audio (movido debajo del CardView) -->
+            <!-- Reproductor de Audio -->
             <LinearLayout
                 android:id="@+id/audioPlayerCard"
                 android:layout_width="match_parent"
