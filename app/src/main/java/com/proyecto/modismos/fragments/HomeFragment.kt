@@ -6,6 +6,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,6 +17,7 @@ import android.widget.SeekBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -25,11 +27,24 @@ import com.proyecto.modismos.activities.AudioRecorderActivity
 import com.proyecto.modismos.activities.AnalysisActivity
 import com.proyecto.modismos.R
 import com.proyecto.modismos.activities.UserMainActivity
+import okhttp3.*
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import okhttp3.RequestBody.Companion.asRequestBody
+import org.json.JSONObject
 import java.io.File
+import java.io.IOException
 import java.text.SimpleDateFormat
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 class HomeFragment : Fragment() {
+
+    companion object {
+        private const val TAG = "HomeFragment"
+        private const val API_GATEWAY_BASE_URL = "https://89f957783931.ngrok-free.app"
+        private const val ANALYZE_TEXT_ENDPOINT = "$API_GATEWAY_BASE_URL/analyze-text"
+        private const val ANALYZE_AUDIO_ENDPOINT = "$API_GATEWAY_BASE_URL/analyze-audio"
+    }
 
     private lateinit var fabMicrophone: FloatingActionButton
     private lateinit var fabUpload: FloatingActionButton
@@ -51,18 +66,25 @@ class HomeFragment : Fragment() {
     private var updateHandler = Handler(Looper.getMainLooper())
     private var updateRunnable: Runnable? = null
 
+    // Cliente HTTP
+    private val httpClient = OkHttpClient.Builder()
+        .connectTimeout(30, TimeUnit.SECONDS)
+        .readTimeout(60, TimeUnit.SECONDS)
+        .writeTimeout(60, TimeUnit.SECONDS)
+        .build()
+
+    // Diálogo de carga
+    private var loadingDialog: AlertDialog? = null
+    private var dialogView: View? = null
+
     private val audioRecorderLauncher = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result ->
         if (result.resultCode == android.app.Activity.RESULT_OK) {
             recordedAudioPath = result.data?.getStringExtra(AudioRecorderActivity.EXTRA_AUDIO_PATH)
-            val audioUri = result.data?.getStringExtra(AudioRecorderActivity.EXTRA_AUDIO_URI)
-
             recordedAudioPath?.let { path ->
                 val fileName = path.substringAfterLast("/")
                 Toast.makeText(requireContext(), "Audio grabado: $fileName", Toast.LENGTH_SHORT).show()
-
-                // Mostrar el reproductor de audio
                 showAudioPlayer(path)
             }
         }
@@ -107,7 +129,6 @@ class HomeFragment : Fragment() {
     }
 
     private fun setupClickListeners() {
-
         btnDictionary.setOnClickListener {
             (activity as? UserMainActivity)?.let { mainActivity ->
                 mainActivity.findViewById<BottomNavigationView>(R.id.bottom_navigation).selectedItemId = R.id.nav_dictionary
@@ -159,8 +180,11 @@ class HomeFragment : Fragment() {
             return
         }
 
-        // Usar AnalysisActivity en lugar de AnalysisFragment
-        AnalysisActivity.startTextAnalysis(requireContext(), texto)
+        Log.d(TAG, "Iniciando análisis de texto: $texto")
+        showLoadingDialog()
+
+        // Enviar texto a análisis
+        sendTextToAnalysis(texto)
     }
 
     private fun analizarAudio() {
@@ -169,8 +193,251 @@ class HomeFragment : Fragment() {
             return
         }
 
-        // Iniciar el análisis de audio con transcripción automática
-        AnalysisActivity.startAudioAnalysisWithTranscription(requireContext(), recordedAudioPath!!)
+        Log.d(TAG, "Iniciando análisis de audio: $recordedAudioPath")
+        showLoadingDialog()
+
+        // Enviar audio a análisis
+        sendAudioToAnalysis(recordedAudioPath!!)
+    }
+
+    private fun sendTextToAnalysis(text: String) {
+        val jsonBody = JSONObject().apply {
+            put("text", text)
+        }
+
+        val requestBody = RequestBody.create(
+            "application/json".toMediaTypeOrNull(),
+            jsonBody.toString()
+        )
+
+        val request = Request.Builder()
+            .url(ANALYZE_TEXT_ENDPOINT)
+            .post(requestBody)
+            .addHeader("Content-Type", "application/json")
+            .build()
+
+        httpClient.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                Log.e(TAG, "Error en análisis de texto", e)
+                activity?.runOnUiThread {
+                    showErrorDialog("Error de conexión", "No se pudo conectar con el servidor. Verifica tu conexión a internet.")
+                }
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                val responseBody = response.body?.string() ?: ""
+                Log.d(TAG, "Respuesta análisis texto: ${response.code} - $responseBody")
+
+                activity?.runOnUiThread {
+                    try {
+                        if (response.isSuccessful) {
+                            handleAnalysisResponse(responseBody, text, null)
+                        } else {
+                            showErrorDialog("Error del servidor", "El servidor respondió con código: ${response.code}")
+                        }
+                    } catch (e: Exception) {
+                        Log.e(TAG, "Error procesando respuesta", e)
+                        showErrorDialog("Error", "No se pudo procesar la respuesta del servidor")
+                    }
+                }
+            }
+        })
+    }
+
+    private fun sendAudioToAnalysis(audioPath: String) {
+        val audioFile = File(audioPath)
+
+        if (!audioFile.exists()) {
+            dismissLoadingDialog()
+            showErrorDialog("Error", "No se encontró el archivo de audio")
+            return
+        }
+
+        val requestBody = MultipartBody.Builder()
+            .setType(MultipartBody.FORM)
+            .addFormDataPart(
+                "file",
+                audioFile.name,
+                audioFile.asRequestBody("audio/*".toMediaTypeOrNull())
+            )
+            .build()
+
+        val request = Request.Builder()
+            .url(ANALYZE_AUDIO_ENDPOINT)
+            .post(requestBody)
+            .build()
+
+        httpClient.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                Log.e(TAG, "Error en análisis de audio", e)
+                activity?.runOnUiThread {
+                    showErrorDialog("Error de conexión", "No se pudo conectar con el servidor. Verifica tu conexión a internet.")
+                }
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                val responseBody = response.body?.string() ?: ""
+                Log.d(TAG, "Respuesta análisis audio: ${response.code} - $responseBody")
+
+                activity?.runOnUiThread {
+                    try {
+                        if (response.isSuccessful) {
+                            handleAnalysisResponse(responseBody, "", audioPath)
+                        } else {
+                            showErrorDialog("Error del servidor", "El servidor respondió con código: ${response.code}")
+                        }
+                    } catch (e: Exception) {
+                        Log.e(TAG, "Error procesando respuesta", e)
+                        showErrorDialog("Error", "No se pudo procesar la respuesta del servidor")
+                    }
+                }
+            }
+        })
+    }
+
+    private fun handleAnalysisResponse(jsonResponse: String, originalText: String, audioPath: String?) {
+        try {
+            val jsonObject = JSONObject(jsonResponse)
+
+            // Extraer información clave
+            val status = jsonObject.optString("status", "unknown")
+            val totalModismos = jsonObject.optInt("total_modismos", 0)
+            val betoAvailable = jsonObject.optBoolean("beto_available", true)
+            val phiAvailable = jsonObject.optBoolean("phi_available", true)
+
+            // Obtener transcripción si es audio
+            val transcription = if (audioPath != null) {
+                jsonObject.optString("transcription", originalText)
+            } else {
+                originalText
+            }
+
+            Log.d(TAG, "Análisis completado - Status: $status, Modismos: $totalModismos, BETO: $betoAvailable, PHI: $phiAvailable")
+
+            when {
+                // Caso 1: Todo OK con modismos detectados
+                status == "success" && totalModismos > 0 && betoAvailable && phiAvailable -> {
+                    Log.d(TAG, "Caso exitoso: $totalModismos modismos detectados")
+                    dismissLoadingDialog()
+                    navigateToAnalysisActivity(jsonResponse, transcription, audioPath)
+                }
+
+                // Caso 2: Sin modismos detectados
+                status == "success" && totalModismos == 0 -> {
+                    Log.d(TAG, "Caso sin modismos")
+                    showNoModismosDialog()
+                }
+
+                // Caso 3: Pipeline parcial (BETO o PHI no disponible)
+                status == "partial_success" || !betoAvailable || !phiAvailable -> {
+                    Log.d(TAG, "Caso pipeline parcial")
+                    val service = when {
+                        !betoAvailable && !phiAvailable -> "BETO y PHI"
+                        !betoAvailable -> "BETO"
+                        !phiAvailable -> "PHI"
+                        else -> "servicios"
+                    }
+                    showPartialServiceDialog(service)
+                }
+
+                // Caso 4: Error desconocido
+                else -> {
+                    Log.w(TAG, "Caso no manejado - Status: $status")
+                    showErrorDialog("Respuesta inesperada", "El servidor devolvió una respuesta inválida")
+                }
+            }
+
+        } catch (e: Exception) {
+            Log.e(TAG, "Error parseando respuesta JSON", e)
+            showErrorDialog("Error", "No se pudo interpretar la respuesta del servidor")
+        }
+    }
+
+    private fun navigateToAnalysisActivity(apiResponse: String, textContent: String, audioPath: String?) {
+        val intent = Intent(requireContext(), AnalysisActivity::class.java).apply {
+            putExtra("api_response", apiResponse)
+            putExtra("text_content", textContent)
+            audioPath?.let { putExtra("audio_path", it) }
+        }
+        startActivity(intent)
+    }
+
+    private fun showLoadingDialog() {
+        dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_loading_analysis, null)
+
+        loadingDialog = AlertDialog.Builder(requireContext())
+            .setView(dialogView)
+            .setCancelable(false)
+            .create()
+
+        loadingDialog?.window?.setBackgroundDrawableResource(android.R.color.transparent)
+        loadingDialog?.show()
+    }
+
+    private fun dismissLoadingDialog() {
+        loadingDialog?.dismiss()
+        loadingDialog = null
+        dialogView = null
+    }
+
+    private fun showDialogState(
+        title: String,
+        message: String = "",
+        showSpinner: Boolean = false,
+        buttonText: String = "Aceptar",
+        onButtonClick: (() -> Unit)? = null
+    ) {
+        dialogView?.let { view ->
+            val tvTitle = view.findViewById<TextView>(R.id.tvDialogTitle)
+            val tvMessage = view.findViewById<TextView>(R.id.tvDialogMessage)
+            val spinKit = view.findViewById<View>(R.id.spinKit)
+            val btnAction = view.findViewById<com.google.android.material.button.MaterialButton>(R.id.btnDialogAction)
+
+            // Actualizar título
+            tvTitle?.text = title
+
+            // Mostrar/ocultar mensaje
+            if (message.isNotEmpty()) {
+                tvMessage?.text = message
+                tvMessage?.isVisible = true
+            } else {
+                tvMessage?.isVisible = false
+            }
+
+            // Mostrar/ocultar spinner
+            spinKit?.isVisible = showSpinner
+
+            // Configurar botón
+            btnAction?.isVisible = !showSpinner
+            btnAction?.text = buttonText
+            btnAction?.setOnClickListener {
+                onButtonClick?.invoke() ?: dismissLoadingDialog()
+            }
+        }
+    }
+
+    private fun showNoModismosDialog() {
+        showDialogState(
+            title = "Sin modismos detectados",
+            message = "No se encontraron modismos colombianos en el texto analizado.",
+            showSpinner = false
+        )
+    }
+
+    private fun showPartialServiceDialog(serviceName: String) {
+        showDialogState(
+            title = "Servicio no disponible",
+            message = "El servicio de $serviceName no está disponible temporalmente. Intenta más tarde.",
+            showSpinner = false
+        )
+    }
+
+    private fun showErrorDialog(title: String, message: String) {
+        showDialogState(
+            title = title,
+            message = message,
+            showSpinner = false
+        )
     }
 
     private fun openAudioRecorder() {
@@ -184,7 +451,6 @@ class HomeFragment : Fragment() {
 
     private fun handleUploadedAudio(uri: Uri) {
         try {
-            // Copiar el audio al almacenamiento interno de la app
             val inputStream = requireContext().contentResolver.openInputStream(uri)
             val audioDir = File(requireContext().filesDir, "audio_recordings")
             if (!audioDir.exists()) {
@@ -221,10 +487,8 @@ class HomeFragment : Fragment() {
 
     private fun showAudioPlayer(audioPath: String) {
         try {
-            // Limpiar MediaPlayer anterior si existe
             releaseMediaPlayer()
 
-            // Crear nuevo MediaPlayer
             mediaPlayer = MediaPlayer().apply {
                 setDataSource(audioPath)
                 prepare()
@@ -237,25 +501,20 @@ class HomeFragment : Fragment() {
                 }
 
                 setOnPreparedListener {
-                    // Configurar UI
                     val duration = duration
                     seekBarAudio.max = duration
                     updateTotalTime(duration)
                     updateCurrentTime(0)
 
-                    // Mostrar nombre del archivo
                     val fileName = audioPath.substringAfterLast("/").substringBeforeLast(".")
-                    tvAudioName.text = if (fileName.startsWith("recording_")) {
-                        "Grabación - ${formatTimestamp(fileName.substringAfter("recording_"))}"
-                    } else if (fileName.startsWith("uploaded_")) {
-                        "Audio subido - ${formatTimestamp(fileName.substringAfter("uploaded_"))}"
-                    } else {
-                        fileName
+                    tvAudioName.text = when {
+                        fileName.startsWith("recording_") -> "Grabación - ${formatTimestamp(fileName.substringAfter("recording_"))}"
+                        fileName.startsWith("uploaded_") -> "Audio subido - ${formatTimestamp(fileName.substringAfter("uploaded_"))}"
+                        else -> fileName
                     }
                 }
             }
 
-            // Mostrar el reproductor
             audioPlayerCard.isVisible = true
             btnPlayPause.setImageResource(R.drawable.ic_play)
             isPlaying = false
@@ -364,5 +623,7 @@ class HomeFragment : Fragment() {
     override fun onDestroy() {
         super.onDestroy()
         releaseMediaPlayer()
+        httpClient.dispatcher.cancelAll()
+        dismissLoadingDialog()
     }
 }

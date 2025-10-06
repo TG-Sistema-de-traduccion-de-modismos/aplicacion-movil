@@ -1,5 +1,6 @@
 package com.proyecto.modismos.adapters
 
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -8,9 +9,11 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.button.MaterialButton
 import com.google.android.material.card.MaterialCardView
 import com.proyecto.modismos.R
 import com.proyecto.modismos.models.Modismo
+import com.proyecto.modismos.activities.WordDetailActivity
 
 class ModismosAdapter(
     private val modismos: List<Modismo>
@@ -34,24 +37,31 @@ class ModismosAdapter(
         private val ivExpandIcon: ImageView = itemView.findViewById(R.id.ivExpandIcon)
         private val llExpandedContent: LinearLayout = itemView.findViewById(R.id.llExpandedContent)
         private val tvDefinicion: TextView = itemView.findViewById(R.id.tvDefinicion)
-        private val tvSinonimos: TextView = itemView.findViewById(R.id.tvSinonimos)
+        private val btnInfo: MaterialButton = itemView.findViewById(R.id.btnInfo) // ✅ nuevo
 
         fun bind(modismo: Modismo) {
             tvPalabra.text = modismo.palabra
             tvDefinicion.text = modismo.definiciones[0]
 
-            // Formatear sinónimos con el punto al inicio en rojo
-            val sinonimosText = modismo.sinonimos.joinToString(", ")
-            tvSinonimos.text = sinonimosText
-
-            // Configurar estado expandido/colapsado
+            // Expandir / colapsar
             llExpandedContent.isVisible = modismo.isExpanded
             ivExpandIcon.rotation = if (modismo.isExpanded) 180f else 0f
 
-            // Click listener para expandir/colapsar
             cardModismo.setOnClickListener {
                 modismo.isExpanded = !modismo.isExpanded
                 notifyItemChanged(adapterPosition)
+            }
+
+            // ✅ Botón "Ver más" → ir a WordDetailActivity
+            btnInfo.setOnClickListener {
+                val context = itemView.context
+                val intent = Intent(context, WordDetailActivity::class.java).apply {
+                    putExtra("palabra", modismo.palabra)
+                    putExtra("tipo", modismo.tipo)
+                    putStringArrayListExtra("definiciones", ArrayList(modismo.definiciones))
+                    putStringArrayListExtra("sinonimos", ArrayList(modismo.sinonimos))
+                }
+                context.startActivity(intent)
             }
         }
     }

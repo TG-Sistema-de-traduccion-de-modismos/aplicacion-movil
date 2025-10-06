@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="center"
+    android:padding="32dp">
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="280dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        app:cardCornerRadius="24dp"
+        app:cardElevation="12dp"
+        android:layout_gravity="center"
+        app:cardBackgroundColor="?attr/colorOnBackground">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="32dp"
+            android:gravity="center">
+
+            <!-- Logo circular -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="30dp"
+                app:cardCornerRadius="80dp"
+                app:cardElevation="30dp"
+                app:cardBackgroundColor="?attr/colorSurface">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="?attr/colorSurface">
+
+                    <ImageView
+                        android:id="@+id/ivDialogLogo"
+                        android:layout_width="150dp"
+                        android:layout_height="150dp"
+                        android:contentDescription="@string/logo_description"
+                        android:src="@drawable/logo_modistra" />
+
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Texto principal -->
+            <TextView
+                android:id="@+id/tvDialogTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="En breve tendrás una respuesta"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textAppearance="?attr/textAppearanceBody1"
+                android:gravity="center"
+                android:layout_marginBottom="12dp"/>
+
+            <!-- Mensaje secundario (para errores) -->
+            <TextView
+                android:id="@+id/tvDialogMessage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=""
+                android:textSize="14sp"
+                android:textAppearance="?attr/textAppearanceBody2"
+                android:gravity="center"
+                android:layout_marginBottom="20dp"
+                android:visibility="gone"/>
+
+            <!-- Spinner de carga -->
+            <com.github.ybq.android.spinkit.SpinKitView
+                android:id="@+id/spinKit"
+                style="@style/SpinKitView"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_gravity="center"
+                app:SpinKit_Color="@color/red_primary"
+                app:SpinKit_Style="FadingCircle" />
+
+            <!-- Botón de acción (solo visible en estados finales) -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnDialogAction"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Aceptar"
+                android:layout_marginTop="16dp"
+                android:visibility="gone"
+                app:cornerRadius="12dp"/>
+
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
+</FrameLayout>

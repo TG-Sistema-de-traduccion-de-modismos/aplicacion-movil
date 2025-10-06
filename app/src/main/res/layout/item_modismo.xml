@@ -4,13 +4,14 @@
     android:id="@+id/cardModismo"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:layout_marginHorizontal="16dp"
     android:layout_marginBottom="12dp"
     app:cardCornerRadius="16dp"
     app:cardElevation="2dp"
-    app:cardBackgroundColor="?attr/colorSurfaceVariant"
+    app:cardBackgroundColor="?attr/colorSurface"
+    android:foreground="?attr/selectableItemBackground"
     android:clickable="true"
-    android:focusable="true"
-    android:foreground="?attr/selectableItemBackground">
+    android:focusable="true">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -19,7 +20,7 @@
         android:padding="16dp"
         android:animateLayoutChanges="true">
 
-        <!-- Header del modismo -->
+        <!-- Encabezado -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -33,7 +34,7 @@
                 android:layout_weight="1"
                 android:text="Bacano"
                 android:textColor="?attr/colorOnSurface"
-                android:textSize="18sp"
+                android:textSize="20sp"
                 android:textStyle="bold"
                 android:fontFamily="sans-serif-medium" />
 
@@ -46,6 +47,18 @@
                 android:rotation="0" />
         </LinearLayout>
 
+        <!-- Chip región -->
+        <com.google.android.material.chip.Chip
+            android:id="@+id/chipRegion"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:text="🇨🇴 Bogotá"
+            android:textSize="12sp"
+            app:chipCornerRadius="8dp"
+            app:chipBackgroundColor="?attr/colorSurfaceVariant"
+            android:textColor="?attr/colorOnSurfaceVariant" />
+
         <!-- Contenido expandible -->
         <LinearLayout
             android:id="@+id/llExpandedContent"
@@ -53,58 +66,43 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:visibility="gone"
-            android:layout_marginTop="12dp"
-            android:padding="12dp"
-            android:background="?attr/colorSurface">
+            android:layout_marginTop="12dp">
 
             <!-- Definición -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Definición"
+                android:textColor="?attr/colorPrimary"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                android:letterSpacing="0.05" />
+
             <TextView
                 android:id="@+id/tvDefinicion"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Algo o alguien que es muy bueno, excelente, genial o atractivo."
+                android:layout_marginTop="4dp"
+                android:text="Algo o alguien que es muy bueno, excelente o atractivo."
                 android:textColor="?attr/colorOnSurface"
-                android:textSize="14sp"
-                android:lineSpacingExtra="2dp"
-                android:layout_marginBottom="8dp" />
+                android:textSize="15sp"
+                android:lineSpacingExtra="2dp" />
 
-            <!-- Sinónimos -->
-            <LinearLayout
+
+            <!-- Botón de detalles -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnInfo"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="• "
-                    android:textColor="?attr/colorPrimary"
-                    android:textSize="16sp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/tvSinonimos"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:text="Genial, estupendo, agradable"
-                    android:textColor="?attr/colorPrimary"
-                    android:textSize="14sp" />
-
-                <!-- Botón info moderno -->
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnInfo"
-                    style="@style/Widget.Material3.Button.Icon"
-                    android:layout_width="36dp"
-                    android:layout_height="36dp"
-                    app:cornerRadius="18dp"
-                    app:iconPadding="0dp"
-                    app:icon="@drawable/ic_info"
-                    app:iconTint="?attr/colorOnPrimary"
-                    app:backgroundTint="?attr/colorPrimary"
-                    android:layout_marginStart="8dp"/>
-            </LinearLayout>
+                android:layout_marginTop="20dp"
+                android:text="Ver más detalles"
+                android:textSize="14sp"
+                android:textStyle="bold"
+                app:icon="@drawable/ic_info"
+                app:iconGravity="start"
+                app:iconPadding="8dp"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:letterSpacing="0.02" />
         </LinearLayout>
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>
