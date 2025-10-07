@@ -11,7 +11,7 @@
     <color name="text_black">#000000</color>
     <color name="text_white">#FFFFFF</color>
     <color name="stroke_color">#E0E0E0</color>
-    <color name="highlight_word">#4CAF50</color>
+    <color name="highlight_word">#FF5722</color>
 
     <!-- Colores básicos -->
     <color name="white">#FFFFFF</color>

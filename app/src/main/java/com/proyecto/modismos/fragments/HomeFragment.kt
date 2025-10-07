@@ -44,6 +44,7 @@ class HomeFragment : Fragment() {
         private const val API_GATEWAY_BASE_URL = "https://89f957783931.ngrok-free.app"
         private const val ANALYZE_TEXT_ENDPOINT = "$API_GATEWAY_BASE_URL/analyze-text"
         private const val ANALYZE_AUDIO_ENDPOINT = "$API_GATEWAY_BASE_URL/analyze-audio"
+        private const val MAX_AUDIO_DURATION_MS = 50000 // 50 segundos en milisegundos
     }
 
     private lateinit var fabMicrophone: FloatingActionButton
@@ -83,9 +84,17 @@ class HomeFragment : Fragment() {
         if (result.resultCode == android.app.Activity.RESULT_OK) {
             recordedAudioPath = result.data?.getStringExtra(AudioRecorderActivity.EXTRA_AUDIO_PATH)
             recordedAudioPath?.let { path ->
-                val fileName = path.substringAfterLast("/")
-                Toast.makeText(requireContext(), "Audio grabado: $fileName", Toast.LENGTH_SHORT).show()
-                showAudioPlayer(path)
+                // Validar duración antes de mostrar
+                if (validateAudioDuration(path)) {
+                    val fileName = path.substringAfterLast("/")
+                    Toast.makeText(requireContext(), "Audio grabado: $fileName", Toast.LENGTH_SHORT).show()
+                    showAudioPlayer(path)
+                } else {
+                    // Eliminar el archivo si excede el límite
+                    File(path).delete()
+                    recordedAudioPath = null
+                    showAudioDurationErrorDialog()
+                }
             }
         }
     }
@@ -172,6 +181,41 @@ class HomeFragment : Fragment() {
         })
     }
 
+    /**
+     * Valida que la duración del audio no exceda el límite de 50 segundos
+     */
+    private fun validateAudioDuration(audioPath: String): Boolean {
+        var tempPlayer: MediaPlayer? = null
+        return try {
+            tempPlayer = MediaPlayer().apply {
+                setDataSource(audioPath)
+                prepare()
+            }
+            val duration = tempPlayer.duration
+            Log.d(TAG, "Audio duration: ${duration}ms (Max: ${MAX_AUDIO_DURATION_MS}ms)")
+            duration <= MAX_AUDIO_DURATION_MS
+        } catch (e: Exception) {
+            Log.e(TAG, "Error validating audio duration", e)
+            false
+        } finally {
+            tempPlayer?.release()
+        }
+    }
+
+    /**
+     * Muestra un diálogo cuando el audio excede el límite de duración
+     */
+    private fun showAudioDurationErrorDialog() {
+        AlertDialog.Builder(requireContext())
+            .setTitle("Audio muy largo")
+            .setMessage("El audio no puede superar los 50 segundos. Por favor, graba o selecciona un audio más corto.")
+            .setPositiveButton("Entendido") { dialog, _ ->
+                dialog.dismiss()
+            }
+            .setCancelable(false)
+            .show()
+    }
+
     private fun analizarTexto() {
         val texto = etTexto.text.toString().trim()
 
@@ -183,7 +227,6 @@ class HomeFragment : Fragment() {
         Log.d(TAG, "Iniciando análisis de texto: $texto")
         showLoadingDialog()
 
-        // Enviar texto a análisis
         sendTextToAnalysis(texto)
     }
 
@@ -196,7 +239,6 @@ class HomeFragment : Fragment() {
         Log.d(TAG, "Iniciando análisis de audio: $recordedAudioPath")
         showLoadingDialog()
 
-        // Enviar audio a análisis
         sendAudioToAnalysis(recordedAudioPath!!)
     }
 
@@ -299,13 +341,11 @@ class HomeFragment : Fragment() {
         try {
             val jsonObject = JSONObject(jsonResponse)
 
-            // Extraer información clave
             val status = jsonObject.optString("status", "unknown")
             val totalModismos = jsonObject.optInt("total_modismos", 0)
             val betoAvailable = jsonObject.optBoolean("beto_available", true)
             val phiAvailable = jsonObject.optBoolean("phi_available", true)
 
-            // Obtener transcripción si es audio
             val transcription = if (audioPath != null) {
                 jsonObject.optString("transcription", originalText)
             } else {
@@ -315,20 +355,17 @@ class HomeFragment : Fragment() {
             Log.d(TAG, "Análisis completado - Status: $status, Modismos: $totalModismos, BETO: $betoAvailable, PHI: $phiAvailable")
 
             when {
-                // Caso 1: Todo OK con modismos detectados
                 status == "success" && totalModismos > 0 && betoAvailable && phiAvailable -> {
                     Log.d(TAG, "Caso exitoso: $totalModismos modismos detectados")
                     dismissLoadingDialog()
                     navigateToAnalysisActivity(jsonResponse, transcription, audioPath)
                 }
 
-                // Caso 2: Sin modismos detectados
                 status == "success" && totalModismos == 0 -> {
                     Log.d(TAG, "Caso sin modismos")
                     showNoModismosDialog()
                 }
 
-                // Caso 3: Pipeline parcial (BETO o PHI no disponible)
                 status == "partial_success" || !betoAvailable || !phiAvailable -> {
                     Log.d(TAG, "Caso pipeline parcial")
                     val service = when {
@@ -340,7 +377,6 @@ class HomeFragment : Fragment() {
                     showPartialServiceDialog(service)
                 }
 
-                // Caso 4: Error desconocido
                 else -> {
                     Log.w(TAG, "Caso no manejado - Status: $status")
                     showErrorDialog("Respuesta inesperada", "El servidor devolvió una respuesta inválida")
@@ -393,10 +429,8 @@ class HomeFragment : Fragment() {
             val spinKit = view.findViewById<View>(R.id.spinKit)
             val btnAction = view.findViewById<com.google.android.material.button.MaterialButton>(R.id.btnDialogAction)
 
-            // Actualizar título
             tvTitle?.text = title
 
-            // Mostrar/ocultar mensaje
             if (message.isNotEmpty()) {
                 tvMessage?.text = message
                 tvMessage?.isVisible = true
@@ -404,10 +438,8 @@ class HomeFragment : Fragment() {
                 tvMessage?.isVisible = false
             }
 
-            // Mostrar/ocultar spinner
             spinKit?.isVisible = showSpinner
 
-            // Configurar botón
             btnAction?.isVisible = !showSpinner
             btnAction?.text = buttonText
             btnAction?.setOnClickListener {
@@ -466,9 +498,16 @@ class HomeFragment : Fragment() {
                 }
             }
 
-            recordedAudioPath = audioFile.absolutePath
-            showAudioPlayer(audioFile.absolutePath)
-            Toast.makeText(requireContext(), "Audio subido correctamente", Toast.LENGTH_SHORT).show()
+            // Validar duración del audio subido
+            if (validateAudioDuration(audioFile.absolutePath)) {
+                recordedAudioPath = audioFile.absolutePath
+                showAudioPlayer(audioFile.absolutePath)
+                Toast.makeText(requireContext(), "Audio subido correctamente", Toast.LENGTH_SHORT).show()
+            } else {
+                // Eliminar el archivo si excede el límite
+                audioFile.delete()
+                showAudioDurationErrorDialog()
+            }
 
         } catch (e: Exception) {
             Toast.makeText(requireContext(), "Error al subir el audio: ${e.message}", Toast.LENGTH_SHORT).show()
