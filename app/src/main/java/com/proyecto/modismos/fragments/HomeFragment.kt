@@ -41,7 +41,7 @@ class HomeFragment : Fragment() {
 
     companion object {
         private const val TAG = "HomeFragment"
-        private const val API_GATEWAY_BASE_URL = "https://89f957783931.ngrok-free.app"
+        private const val API_GATEWAY_BASE_URL = "https://modistra.duckdns.org"
         private const val ANALYZE_TEXT_ENDPOINT = "$API_GATEWAY_BASE_URL/analyze-text"
         private const val ANALYZE_AUDIO_ENDPOINT = "$API_GATEWAY_BASE_URL/analyze-audio"
         private const val MAX_AUDIO_DURATION_MS = 50000 // 50 segundos en milisegundos
