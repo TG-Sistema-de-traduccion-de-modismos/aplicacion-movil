@@ -50,8 +50,9 @@ Exploración de la riqueza lingüística bogotana
 - **Backend**: API RESTful
 - **Reconocimiento de Voz**: Whisper (OpenAI)
 - **Procesamiento de Lenguaje Natural**: BETO (BERT en español) entrenado con dataset de modismos bogotanos
+- **Traduccion de frase a Lenguaje Natural**: Phi-3-mini-4k-instruct 
 - **Base de Datos**: Firebase
-- **Arquitectura**: Cliente-Servidor
+- **Arquitectura**: Microservicios con orquestador
 
 ## Problemática Abordada
 
@@ -70,26 +71,19 @@ Modistra elimina estas barreras facilitando la comprensión del lenguaje informa
 
 ### Flujo de Procesamiento de Audio
 ```
-Audio Input → Whisper (Speech-to-Text) → BETO (Análisis Contextual) → Detección de Modismos → Traducción
+Audio Input → API Gateway → Orquestador → Whisper (Speech-to-Text) → BETO (Análisis Contextual) → Detección de Modismos → Phi (Traduccion a lenguaje natural)
 ```
 
 ### Flujo de Procesamiento de Texto
 ```
-Texto Input → BETO (Análisis Sintáctico) → Identificación de Expresiones → Traducción Contextual
+Audio Input → API Gateway → Orquestador → BETO (Análisis Contextual) → Detección de Modismos → Phi (Traduccion a lenguaje natural)
 ```
 
 ### Motor de Inteligencia Artificial
 - **Whisper**: Reconocimiento automático de voz de alta precisión
 - **BETO**: Modelo BERT en español fine-tuned con dataset especializado en modismos bogotanos
 - Análisis contextual avanzado para interpretación precisa
-- Sistema de aprendizaje continuo
-
-### Arquitectura Cliente-Servidor
-La aplicación utiliza una arquitectura distribuida que permite:
-- **Cliente**: Aplicación móvil optimizada
-- **Servidor**: Procesamiento de IA centralizado
-- **APIs RESTful**: Comunicación eficiente entre componentes
-- **Base de Datos**: Gestión persistente de usuarios y modismos
+- **PHI**: Modelo instruccional desarrollado por Microsoft que hace uso de la salida del modelo BETO para traducir la frase con modismos a lenguaje natural
 
 ## Requisitos del Sistema
 
@@ -97,7 +91,7 @@ La aplicación utiliza una arquitectura distribuida que permite:
 - Conectividad: Acceso a internet
 - Hardware: Micrófono integrado
 
-## Módulos del Sistema
+## Módulos de la aplicacion movil
 
 ### Módulo 1: Gestión de Cuentas de Usuario
 - Registro de nuevos usuarios
@@ -117,7 +111,7 @@ La aplicación utiliza una arquitectura distribuida que permite:
 
 ### Módulo 4: Detección y Traducción de Modismos
 - Identificación de modismos usando BETO
-- Traducción contextual precisa
+- Traducción contextual precisa usando Phi
 - Generación de versiones en español neutro
 
 ### Módulo 5: Almacenamiento y Consulta
@@ -132,21 +126,4 @@ La aplicación utiliza una arquitectura distribuida que permite:
 - **Preservación Cultural**: Respeta y documenta las particularidades del habla bogotana
 - **Experiencia Urbana**: Mejora la calidad de vida en entornos multiculturales
 
-## Información del Proyecto
 
-Este proyecto fue desarrollado como Trabajo de Grado en Ingeniería de Sistemas en la **Pontificia Universidad Javeriana**, Bogotá D.C., 2025.
-
-### Equipo de Desarrollo
-- Pablo Javier Escobar Gómez
-- Gabriel Espitia Romero  
-- Juan Felipe González Quintero
-- Oscar Rodríguez Gómez
-
-### Dirección Académica
-**Directora**: Ing. Andrea del Pilar Rueda Olarte
-
-### Institución
-**Pontificia Universidad Javeriana**  
-Facultad de Ingeniería  
-Programa de Ingeniería de Sistemas  
-Bogotá D.C., Colombia
