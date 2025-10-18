@@ -237,7 +237,7 @@ class AnalysisActivity : AppCompatActivity() {
             }
 
             // Filtrar palabras que realmente aparecen en la frase
-            val palabrasEnFrase = filterWordsInSentence(palabrasDetectadas, textContent)
+            val palabrasEnFrase = palabrasDetectadas
             Log.d(TAG, "Palabras filtradas presentes en la frase: $palabrasEnFrase")
 
             // Cargar datos completos desde Firebase

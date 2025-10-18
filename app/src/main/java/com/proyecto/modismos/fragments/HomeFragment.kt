@@ -41,9 +41,9 @@ class HomeFragment : Fragment() {
 
     companion object {
         private const val TAG = "HomeFragment"
-        private const val API_GATEWAY_BASE_URL = "https://modistra.duckdns.org"
-        private const val ANALYZE_TEXT_ENDPOINT = "$API_GATEWAY_BASE_URL/analyze-text"
-        private const val ANALYZE_AUDIO_ENDPOINT = "$API_GATEWAY_BASE_URL/analyze-audio"
+        private const val API_GATEWAY_BASE_URL = "https://modistra-api.duckdns.org"
+        private const val ANALYZE_TEXT_ENDPOINT = "$API_GATEWAY_BASE_URL/text"
+        private const val ANALYZE_AUDIO_ENDPOINT = "$API_GATEWAY_BASE_URL/audio"
         private const val MAX_AUDIO_DURATION_MS = 50000 // 50 segundos en milisegundos
     }
 
@@ -347,10 +347,12 @@ class HomeFragment : Fragment() {
             val phiAvailable = jsonObject.optBoolean("phi_available", true)
 
             val transcription = if (audioPath != null) {
-                jsonObject.optString("transcription", originalText)
+                jsonObject.optString("original_text", "")
             } else {
                 originalText
             }
+
+            Log.d("HomeFragment", "Texto que se enviará a AnalysisActivity: $transcription")
 
             Log.d(TAG, "Análisis completado - Status: $status, Modismos: $totalModismos, BETO: $betoAvailable, PHI: $phiAvailable")
 
