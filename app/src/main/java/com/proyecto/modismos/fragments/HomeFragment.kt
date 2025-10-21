@@ -44,7 +44,7 @@ class HomeFragment : Fragment() {
         private const val API_GATEWAY_BASE_URL = "https://modistra-api.duckdns.org"
         private const val ANALYZE_TEXT_ENDPOINT = "$API_GATEWAY_BASE_URL/text"
         private const val ANALYZE_AUDIO_ENDPOINT = "$API_GATEWAY_BASE_URL/audio"
-        private const val MAX_AUDIO_DURATION_MS = 50000 // 50 segundos en milisegundos
+        private const val MAX_AUDIO_DURATION_MS = 30000 // 50 segundos en milisegundos
     }
 
     private lateinit var fabMicrophone: FloatingActionButton

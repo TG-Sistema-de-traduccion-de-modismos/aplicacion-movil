@@ -49,7 +49,7 @@ class AudioRecorderActivity : AppCompatActivity() {
     private var pulseAnimator: AnimatorSet? = null
 
     companion object {
-        const val MAX_RECORDING_TIME = 60000L // 1 minuto en milisegundos
+        const val MAX_RECORDING_TIME = 30000L // 1 minuto en milisegundos
         const val EXTRA_AUDIO_PATH = "audio_path"
         const val EXTRA_AUDIO_URI = "audio_uri"
         private const val TAG = "AudioRecorderActivity"
