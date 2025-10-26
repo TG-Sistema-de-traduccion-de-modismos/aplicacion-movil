@@ -18,6 +18,37 @@
         android:src="@drawable/ic_close"
         app:tint="@color/white" />
 
+    <!-- Disclaimer de duración máxima (superior) -->
+    <LinearLayout
+        android:id="@+id/disclaimerCard"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/btnClose"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="15dp"
+        android:layout_marginStart="32dp"
+        android:layout_marginEnd="32dp"
+        android:background="@drawable/disclaimer_background"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:padding="12dp">
+
+        <ImageView
+            android:layout_width="20dp"
+            android:layout_height="20dp"
+            android:src="@drawable/ic_info"
+            app:tint="@color/white"
+            android:layout_marginEnd="8dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Duración máxima: 30 segundos"
+            android:textColor="@color/white"
+            android:textSize="14sp" />
+
+    </LinearLayout>
+
     <!-- Contenedor central -->
     <LinearLayout
         android:layout_width="match_parent"

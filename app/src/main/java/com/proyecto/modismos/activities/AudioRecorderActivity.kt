@@ -44,15 +44,15 @@ class AudioRecorderActivity : AppCompatActivity() {
     private var pausedTime = 0L
     private var wasCancelled = false
 
-
     private var timer: CountDownTimer? = null
     private var pulseAnimator: AnimatorSet? = null
 
     companion object {
-        const val MAX_RECORDING_TIME = 60000L // 1 minuto en milisegundos
+        const val MAX_RECORDING_TIME = 30000L // milisegundos
         const val EXTRA_AUDIO_PATH = "audio_path"
         const val EXTRA_AUDIO_URI = "audio_uri"
         private const val TAG = "AudioRecorderActivity"
+        private const val AUDIO_BIT_RATE = 128000 // 128 kbps
     }
 
     private val requestPermissionLauncher = registerForActivityResult(
@@ -73,7 +73,6 @@ class AudioRecorderActivity : AppCompatActivity() {
         supportActionBar?.hide()
         setupTransparentBars()
 
-
         initViews()
         setupClickListeners()
         setupBackPressedHandler()
@@ -83,6 +82,7 @@ class AudioRecorderActivity : AppCompatActivity() {
     private fun setupBackPressedHandler() {
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
+                wasCancelled = true
                 stopRecordingAndFinish()
             }
         })
@@ -146,7 +146,7 @@ class AudioRecorderActivity : AppCompatActivity() {
 
     private fun startRecording() {
         try {
-            // Crear archivo en almacenamiento interno (más seguro y no requiere permisos especiales)
+            // Crear archivo en almacenamiento interno
             val audioDir = File(filesDir, "audio_recordings")
             if (!audioDir.exists()) {
                 audioDir.mkdirs()
@@ -154,10 +154,7 @@ class AudioRecorderActivity : AppCompatActivity() {
 
             audioFile = File(audioDir, "recording_${System.currentTimeMillis()}.m4a")
 
-            // Para Android 10+ también podemos usar MediaStore si queremos guardar en almacenamiento compartido
-            // pero para esta funcionalidad, el almacenamiento interno es suficiente
-
-            // Configurar MediaRecorder
+            // Configurar MediaRecorder con ALTA CALIDAD
             mediaRecorder = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 MediaRecorder(this)
             } else {
@@ -165,9 +162,16 @@ class AudioRecorderActivity : AppCompatActivity() {
                 MediaRecorder()
             }.apply {
                 setAudioSource(MediaRecorder.AudioSource.MIC)
+
                 setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
+
                 setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
+
+                setAudioEncodingBitRate(AUDIO_BIT_RATE) // 128 kbps
+
                 setOutputFile(audioFile?.absolutePath)
+
+                // Duración máxima
                 setMaxDuration(MAX_RECORDING_TIME.toInt())
 
                 setOnInfoListener { _, what, _ ->
@@ -181,6 +185,10 @@ class AudioRecorderActivity : AppCompatActivity() {
                 try {
                     prepare()
                     start()
+                    Log.d(TAG, "Recording started with OPTIMIZED settings:")
+                    Log.d(TAG, "  - Bit Rate: $AUDIO_BIT_RATE bps")
+                    Log.d(TAG, "  - Source: MIC")
+                    Log.d(TAG, "  - Format: MPEG_4 (AAC)")
                 } catch (e: Exception) {
                     Log.e(TAG, "Error preparing MediaRecorder", e)
                     throw e
@@ -245,9 +253,15 @@ class AudioRecorderActivity : AppCompatActivity() {
         stopRecording()
 
         if (wasCancelled) {
-            setResult(RESULT_CANCELED)  // ← Esto no devuelve audio
+            // Si fue cancelado, eliminar el archivo
+            audioFile?.let { file ->
+                if (file.exists()) {
+                    file.delete()
+                    Log.d(TAG, "Cancelled recording deleted")
+                }
+            }
+            setResult(RESULT_CANCELED)
         } else {
-            // Devolver el path del archivo de audio solo si no fue cancelado
             audioFile?.let { file ->
                 if (file.exists() && file.length() > 0) {
                     intent.putExtra(EXTRA_AUDIO_PATH, file.absolutePath)
@@ -258,13 +272,13 @@ class AudioRecorderActivity : AppCompatActivity() {
                     Log.d(TAG, "Audio saved: ${file.absolutePath}, size: ${file.length()} bytes")
                 } else {
                     Log.w(TAG, "Audio file is empty or doesn't exist")
+                    setResult(RESULT_CANCELED)
                 }
             }
         }
 
         finish()
     }
-
 
     private fun stopRecording() {
         timer?.cancel()
@@ -280,7 +294,7 @@ class AudioRecorderActivity : AppCompatActivity() {
             }
         } catch (e: Exception) {
             Log.e(TAG, "Error stopping recording", e)
-            // Si hay error al detener, aún podemos intentar guardar lo que se grabó
+            wasCancelled = true
         }
 
         mediaRecorder = null
@@ -306,7 +320,6 @@ class AudioRecorderActivity : AppCompatActivity() {
     }
 
     private fun startPulseAnimation() {
-        // Animación de pulso para los círculos
         val pulseOuter = ObjectAnimator.ofFloat(circleOuter, "scaleX", 1f, 1.2f, 1f).apply {
             duration = 2000
             repeatCount = ObjectAnimator.INFINITE

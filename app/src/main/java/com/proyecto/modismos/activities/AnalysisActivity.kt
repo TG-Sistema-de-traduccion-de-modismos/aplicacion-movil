@@ -491,10 +491,11 @@ class AnalysisActivity : AppCompatActivity() {
 
         for (modismo in detectedModismos) {
             val palabra = modismo.palabra
-            var startIndex = 0
             val textLower = text.lowercase()
             val palabraLower = palabra.lowercase()
 
+            // Buscar coincidencias exactas primero
+            var startIndex = 0
             while (startIndex < text.length) {
                 val index = textLower.indexOf(palabraLower, startIndex)
                 if (index == -1) break
@@ -516,6 +517,59 @@ class AnalysisActivity : AppCompatActivity() {
                 )
 
                 startIndex = endIndex
+            }
+
+            // Si no hubo coincidencias exactas, buscar palabras que comiencen con la raíz
+            if (startIndex == 0) {
+                // Obtener raíz de la palabra (mínimo 4 caracteres para evitar falsos positivos)
+                val raiz = if (palabraLower.length > 4) {
+                    palabraLower.substring(0, palabraLower.length - 2)
+                } else {
+                    palabraLower
+                }
+
+                // Buscar palabras en el texto que comiencen con la raíz
+                val palabrasEnTexto = text.split(Regex("\\s+"))
+                var currentPosition = 0
+
+                for (palabraTexto in palabrasEnTexto) {
+                    val palabraTextoLower = palabraTexto.lowercase()
+                        .replace(Regex("[^a-záéíóúñ]"), "") // Quitar puntuación
+
+                    // Verificar si la palabra comienza con la raíz
+                    if (palabraTextoLower.startsWith(raiz) && palabraTextoLower.length >= raiz.length) {
+                        // Encontrar la posición exacta en el texto original
+                        val posicionEnTexto = textLower.indexOf(palabraTextoLower, currentPosition)
+
+                        if (posicionEnTexto != -1) {
+                            // Encontrar los límites exactos de la palabra (considerando puntuación)
+                            var startWord = posicionEnTexto
+                            var endWord = posicionEnTexto + palabraTextoLower.length
+
+                            // Ajustar para incluir la palabra completa sin puntuación
+                            while (endWord < text.length && text[endWord].isLetter()) {
+                                endWord++
+                            }
+
+                            spannable.setSpan(
+                                ForegroundColorSpan(highlightColor),
+                                startWord,
+                                endWord,
+                                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                            )
+
+                            spannable.setSpan(
+                                android.text.style.StyleSpan(android.graphics.Typeface.BOLD),
+                                startWord,
+                                endWord,
+                                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                            )
+                        }
+                    }
+
+                    // Actualizar posición para la siguiente búsqueda
+                    currentPosition = textLower.indexOf(palabraTexto.lowercase(), currentPosition) + palabraTexto.length
+                }
             }
         }
 
