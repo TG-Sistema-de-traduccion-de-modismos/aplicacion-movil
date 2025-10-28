@@ -14,21 +14,26 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.proyecto.modismos.R
+import com.proyecto.modismos.adapters.AlphabetAdapter
 import com.proyecto.modismos.adapters.WordAdapter
 import com.proyecto.modismos.models.Modismo
 
 class DictionaryFragment : Fragment() {
 
     private lateinit var recyclerView: RecyclerView
+    private lateinit var alphabetRecyclerView: RecyclerView
     private lateinit var adapter: WordAdapter
+    private lateinit var alphabetAdapter: AlphabetAdapter
     private lateinit var progressBar: ProgressBar
     private lateinit var emptyStateText: TextView
     private lateinit var emptyStateContainer: LinearLayout
+    private lateinit var wordCountTextView: TextView
 
     private val db = FirebaseFirestore.getInstance()
     private val auth = FirebaseAuth.getInstance()
 
     private val discoveredWords = mutableListOf<Modismo>()
+    private val alphabet = ('A'..'Z').map { it.toString() }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -42,6 +47,7 @@ class DictionaryFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         initViews(view)
         setupRecyclerView()
+        setupAlphabetBar()
     }
 
     override fun onResume() {
@@ -51,21 +57,20 @@ class DictionaryFragment : Fragment() {
 
     private fun initViews(view: View) {
         recyclerView = view.findViewById(R.id.rv_modismos)
-        // Inicialización segura para elementos que podrían no existir en el layout
+        alphabetRecyclerView = view.findViewById(R.id.rv_alphabet)
+        wordCountTextView = view.findViewById(R.id.tv_word_count)
+
         progressBar = view.findViewById(R.id.progress_bar) ?: run {
-            // Si no existe en el layout, crear uno programáticamente pero mantenerlo invisible
             ProgressBar(requireContext()).apply {
                 visibility = View.GONE
             }
         }
         emptyStateText = view.findViewById(R.id.tv_empty_state) ?: run {
-            // Si no existe en el layout, crear uno programáticamente pero mantenerlo invisible
             TextView(requireContext()).apply {
                 visibility = View.GONE
             }
         }
         emptyStateContainer = view.findViewById(R.id.empty_state_container) ?: run {
-            // Si no existe en el layout, crear uno programáticamente pero mantenerlo invisible
             LinearLayout(requireContext()).apply {
                 visibility = View.GONE
             }
@@ -81,7 +86,35 @@ class DictionaryFragment : Fragment() {
         }
     }
 
+    private fun setupAlphabetBar() {
+        alphabetAdapter = AlphabetAdapter(alphabet) { letter ->
+            scrollToLetter(letter)
+        }
 
+        alphabetRecyclerView.apply {
+            layoutManager = LinearLayoutManager(requireContext())
+            adapter = alphabetAdapter
+            setHasFixedSize(true)
+        }
+    }
+
+    private fun scrollToLetter(letter: String) {
+        val position = discoveredWords.indexOfFirst {
+            it.palabra.firstOrNull()?.uppercaseChar().toString() == letter
+        }
+
+        if (position != -1) {
+            recyclerView.smoothScrollToPosition(position)
+        }
+    }
+
+    private fun updateAlphabetBar() {
+        val activeLetters = discoveredWords
+            .mapNotNull { it.palabra.firstOrNull()?.uppercaseChar()?.toString() }
+            .toSet()
+
+        alphabetAdapter.setActiveLetters(activeLetters)
+    }
 
     private fun loadDiscoveredWords() {
         val currentUser = auth.currentUser
@@ -92,7 +125,6 @@ class DictionaryFragment : Fragment() {
 
         showLoading(true)
 
-        // Obtener las palabras descubiertas del usuario
         db.collection("usuarios")
             .document(currentUser.uid)
             .get()
@@ -102,30 +134,31 @@ class DictionaryFragment : Fragment() {
 
                     if (discoveredWordsList.isEmpty()) {
                         showLoading(false)
-                        showEmptyState("¡Descubre palabras jugando para llenar tu diccionario!")
+                        updateWordCount(0)
+                        showEmptyState("¡Descubre palabras para llenar tu diccionario!")
                         return@addOnSuccessListener
                     }
 
-                    // Cargar los detalles de cada palabra desde la colección "palabras"
                     loadWordDetails(discoveredWordsList)
                 } else {
                     showLoading(false)
+                    updateWordCount(0)
                     showEmptyState("¡Descubre palabras jugando para llenar tu diccionario!")
                 }
             }
             .addOnFailureListener { exception ->
                 showLoading(false)
+                updateWordCount(0)
                 showEmptyState("Error al cargar el diccionario")
                 Log.e("DictionaryFragment", "Error loading user data", exception)
             }
     }
 
     private fun loadWordDetails(wordNames: List<String>) {
-        if (!isAdded) return // Verificar que el fragment esté adjunto
+        if (!isAdded) return
 
         discoveredWords.clear()
 
-        // Usar un contador para saber cuándo terminar de cargar todas las palabras
         var loadedCount = 0
         val totalWords = wordNames.size
 
@@ -158,7 +191,6 @@ class DictionaryFragment : Fragment() {
 
                     loadedCount++
 
-                    // Cuando se hayan cargado todas las palabras, actualizar la UI
                     if (loadedCount == totalWords && isAdded) {
                         showLoading(false)
                         updateUI()
@@ -177,39 +209,55 @@ class DictionaryFragment : Fragment() {
     }
 
     private fun updateUI() {
-        if (!isAdded) return // Verificar que el fragment esté adjunto
+        if (!isAdded) return
 
         if (discoveredWords.isEmpty()) {
-            showEmptyState("¡Descubre palabras jugando para llenar tu diccionario!")
+            updateWordCount(0)
+            showEmptyState("¡Descubre palabras para llenar tu diccionario!")
         } else {
             // Ordenar palabras alfabéticamente
             discoveredWords.sortBy { it.palabra }
 
+            updateWordCount(discoveredWords.size)
+            updateAlphabetBar()
+
             if (::recyclerView.isInitialized) {
                 recyclerView.visibility = View.VISIBLE
+            }
+
+            if (::alphabetRecyclerView.isInitialized) {
+                alphabetRecyclerView.visibility = View.VISIBLE
             }
 
             if (::emptyStateContainer.isInitialized && emptyStateContainer.parent != null) {
                 emptyStateContainer.visibility = View.GONE
             }
 
-            // Notificar cambios en el adapter
             if (::adapter.isInitialized) {
                 adapter.notifyDataSetChanged()
             }
         }
     }
 
+    private fun updateWordCount(count: Int) {
+        if (::wordCountTextView.isInitialized) {
+            wordCountTextView.text = "Modismos encontrados: $count"
+        }
+    }
+
     private fun showLoading(show: Boolean) {
         if (!isAdded) return
 
-        // Solo mostrar/ocultar si los elementos existen en el layout
         if (::progressBar.isInitialized && progressBar.parent != null) {
             progressBar.visibility = if (show) View.VISIBLE else View.GONE
         }
 
         if (::recyclerView.isInitialized) {
             recyclerView.visibility = if (show) View.GONE else View.VISIBLE
+        }
+
+        if (::alphabetRecyclerView.isInitialized) {
+            alphabetRecyclerView.visibility = if (show) View.GONE else View.VISIBLE
         }
 
         if (::emptyStateContainer.isInitialized && emptyStateContainer.parent != null) {
@@ -224,6 +272,10 @@ class DictionaryFragment : Fragment() {
             recyclerView.visibility = View.GONE
         }
 
+        if (::alphabetRecyclerView.isInitialized) {
+            alphabetRecyclerView.visibility = View.GONE
+        }
+
         if (::progressBar.isInitialized && progressBar.parent != null) {
             progressBar.visibility = View.GONE
         }
@@ -234,7 +286,6 @@ class DictionaryFragment : Fragment() {
                 emptyStateText.text = message
             }
         } else {
-            // Si no hay contenedor para mostrar el estado vacío, usar Log para debug
             Log.d("DictionaryFragment", "Empty state: $message")
         }
     }

@@ -40,7 +40,7 @@
                 android:text="Aquí puedes ver todos los modismos que\nhemos detectado en tus conversaciones."
                 android:textColor="?attr/colorOnPrimary"
                 android:textSize="14sp"
-                android:layout_marginTop="4dp"
+                android:layout_marginTop="10dp"
                 android:alpha="0.9"
                 android:lineSpacingExtra="2dp" />
 
@@ -48,23 +48,63 @@
 
     </RelativeLayout>
 
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="16dp"
+        android:gravity="center">
+
+        <TextView
+            android:id="@+id/tv_word_count"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Modismos encontrados: "
+            android:textColor="?attr/colorOnSurface"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+
+
+    </LinearLayout>
+
     <!-- Contenedor para el contenido principal -->
     <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1">
 
-        <!-- RecyclerView para la lista de palabras -->
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rv_modismos"
+        <!-- Layout con RecyclerView y barra alfabética -->
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:paddingStart="24dp"
-            android:paddingEnd="24dp"
-            android:paddingTop="24dp"
-            android:paddingBottom="16dp"
-            android:clipToPadding="false"
-            android:scrollbars="none" />
+            android:layout_height="match_parent">
+
+            <!-- RecyclerView para la lista de palabras -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_modismos"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:paddingStart="24dp"
+                android:paddingEnd="40dp"
+                android:paddingTop="8dp"
+                android:paddingBottom="16dp"
+                android:clipToPadding="false"
+                android:scrollbars="none" />
+
+            <!-- Barra alfabética lateral -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_alphabet"
+                android:layout_width="28dp"
+                android:layout_height="match_parent"
+                android:layout_alignParentEnd="true"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
+                android:paddingEnd="8dp"
+                android:scrollbars="none"
+                android:overScrollMode="never" />
+
+        </RelativeLayout>
 
         <!-- ProgressBar para mostrar estado de carga -->
         <ProgressBar
@@ -92,14 +132,14 @@
                 android:src="@drawable/ic_book_outline"
                 android:layout_marginBottom="16dp"
                 android:alpha="0.6"
-                app:tint="?attr/colorOnBackground" />
+                app:tint="?attr/editTextColor" />
 
             <!-- Texto principal del estado vacío -->
             <TextView
                 android:id="@+id/tv_empty_state"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="¡Descubre palabras jugando para llenar tu diccionario!"
+                android:text="¡Descubre palabras para llenar tu diccionario!"
                 android:textSize="18sp"
                 android:textColor="?attr/colorOnSurface"
                 android:textAlignment="center"
