@@ -9,14 +9,13 @@ import java.io.File
 import java.io.IOException
 import java.util.concurrent.TimeUnit
 
-class ApiService {
-
+class ApiService(private val baseUrl: String = "https://modistra-api.duckdns.org") {
     companion object {
         private const val TAG = "ApiService"
-        private const val API_GATEWAY_BASE_URL = "https://modistra-api.duckdns.org"
-        private const val ANALYZE_TEXT_ENDPOINT = "$API_GATEWAY_BASE_URL/text"
-        private const val ANALYZE_AUDIO_ENDPOINT = "$API_GATEWAY_BASE_URL/audio"
     }
+
+    private val ANALYZE_TEXT_ENDPOINT = "$baseUrl/text"
+    private val ANALYZE_AUDIO_ENDPOINT = "$baseUrl/audio"
 
     private val httpClient = OkHttpClient.Builder()
         .connectTimeout(30, TimeUnit.SECONDS)
