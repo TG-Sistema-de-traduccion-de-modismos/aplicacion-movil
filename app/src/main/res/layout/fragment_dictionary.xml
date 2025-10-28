@@ -132,14 +132,14 @@
                 android:src="@drawable/ic_book_outline"
                 android:layout_marginBottom="16dp"
                 android:alpha="0.6"
-                app:tint="?attr/colorOnBackground" />
+                app:tint="?attr/editTextColor" />
 
             <!-- Texto principal del estado vacío -->
             <TextView
                 android:id="@+id/tv_empty_state"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="¡Descubre palabras jugando para llenar tu diccionario!"
+                android:text="¡Descubre palabras para llenar tu diccionario!"
                 android:textSize="18sp"
                 android:textColor="?attr/colorOnSurface"
                 android:textAlignment="center"

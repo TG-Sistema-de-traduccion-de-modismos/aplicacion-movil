@@ -135,7 +135,7 @@ class DictionaryFragment : Fragment() {
                     if (discoveredWordsList.isEmpty()) {
                         showLoading(false)
                         updateWordCount(0)
-                        showEmptyState("¡Descubre palabras jugando para llenar tu diccionario!")
+                        showEmptyState("¡Descubre palabras para llenar tu diccionario!")
                         return@addOnSuccessListener
                     }
 
@@ -213,7 +213,7 @@ class DictionaryFragment : Fragment() {
 
         if (discoveredWords.isEmpty()) {
             updateWordCount(0)
-            showEmptyState("¡Descubre palabras jugando para llenar tu diccionario!")
+            showEmptyState("¡Descubre palabras para llenar tu diccionario!")
         } else {
             // Ordenar palabras alfabéticamente
             discoveredWords.sortBy { it.palabra }

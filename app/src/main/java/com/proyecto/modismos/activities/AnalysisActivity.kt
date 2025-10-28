@@ -1,8 +1,5 @@
 package com.proyecto.modismos.activities
 
-import android.content.Context
-import android.content.Intent
-import android.media.MediaPlayer
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -10,12 +7,12 @@ import android.text.Spannable
 import android.text.SpannableString
 import android.text.style.ForegroundColorSpan
 import android.util.Log
-import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.SeekBar
 import android.widget.TextView
 import android.widget.Toast
+import android.media.MediaPlayer
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat
@@ -30,7 +27,6 @@ import com.proyecto.modismos.R
 import com.proyecto.modismos.adapters.ModismosAdapter
 import com.proyecto.modismos.models.Modismo
 import org.json.JSONObject
-import java.io.File
 import java.util.Locale
 
 class AnalysisActivity : AppCompatActivity() {
@@ -42,6 +38,7 @@ class AnalysisActivity : AppCompatActivity() {
         private const val EXTRA_AUDIO_PATH = "audio_path"
     }
 
+    // Views
     private lateinit var tvTextContent: TextView
     private lateinit var audioPlayerCard: LinearLayout
     private lateinit var btnPlayPause: FloatingActionButton
@@ -53,49 +50,52 @@ class AnalysisActivity : AppCompatActivity() {
     private lateinit var btnOriginal: TextView
     private lateinit var btnNeutral: TextView
 
+    // Audio
     private var mediaPlayer: MediaPlayer? = null
     private var isPlaying = false
     private var updateHandler = Handler(Looper.getMainLooper())
     private var updateRunnable: Runnable? = null
-    private lateinit var modismosAdapter: ModismosAdapter
 
+    // Data
+    private lateinit var modismosAdapter: ModismosAdapter
     private var textContent: String = ""
     private var audioPath: String? = null
     private var isNeutralSelected = false
     private var detectedModismos: List<Modismo> = emptyList()
     private var neutralizedSentence: String = ""
 
+    // Firebase
     private lateinit var firestore: FirebaseFirestore
     private lateinit var auth: FirebaseAuth
 
-    // Mapa para guardar las definiciones que detectó BETO
+    // Definiciones de BETO
     private val betoDefinitions = mutableMapOf<String, String>()
+
+    // NUEVO: Lista de cambios de phi_response para highlighting
+    private data class CambioNeutral(
+        val palabra: String,
+        val indiceInicio: Int,
+        val indiceFin: Int
+    )
+    private var cambiosNeutrales: List<CambioNeutral> = emptyList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_analysis)
-
         Log.d(TAG, "=== AnalysisActivity iniciada ===")
 
-        // Inicializar Firebase
         firestore = FirebaseFirestore.getInstance()
         auth = FirebaseAuth.getInstance()
 
-        // Ocultar ActionBar y configurar barras transparentes
         supportActionBar?.hide()
         setupTransparentBars()
 
-        // Inicializar vistas PRIMERO
         initViews()
         setupClickListeners()
         setupRecyclerView()
 
-        // DESPUÉS obtener datos del intent y parsear
         getIntentData()
-
-        // Procesar respuesta de API
         processApiResponse()
-
         updateToggleButtons()
     }
 
@@ -109,7 +109,6 @@ class AnalysisActivity : AppCompatActivity() {
         Log.d(TAG, "  audioPath: $audioPath")
         Log.d(TAG, "  apiResponse length: ${apiResponse.length}")
 
-        // Parsear respuesta de API
         if (apiResponse.isNotEmpty()) {
             parseApiResponse(apiResponse)
         }
@@ -131,13 +130,8 @@ class AnalysisActivity : AppCompatActivity() {
     }
 
     private fun setupClickListeners() {
-        btnClose.setOnClickListener {
-            finish()
-        }
-
-        btnPlayPause.setOnClickListener {
-            togglePlayPause()
-        }
+        btnClose.setOnClickListener { finish() }
+        btnPlayPause.setOnClickListener { togglePlayPause() }
 
         btnOriginal.setOnClickListener {
             if (isNeutralSelected) {
@@ -162,7 +156,6 @@ class AnalysisActivity : AppCompatActivity() {
                     updateCurrentTime(progress)
                 }
             }
-
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}
             override fun onStopTrackingTouch(seekBar: SeekBar?) {}
         })
@@ -180,7 +173,6 @@ class AnalysisActivity : AppCompatActivity() {
     private fun parseApiResponse(jsonResponse: String) {
         try {
             val jsonObject = JSONObject(jsonResponse)
-
             Log.d(TAG, "=== PARSEANDO RESPUESTA DE API ===")
             Log.d(TAG, "JSON completo: $jsonResponse")
 
@@ -188,12 +180,37 @@ class AnalysisActivity : AppCompatActivity() {
             neutralizedSentence = jsonObject.optString("frase_neutral", "")
             Log.d(TAG, "Frase neutral: $neutralizedSentence")
 
+            // NUEVO: Parsear phi_response para obtener los cambios
+            if (jsonObject.has("phi_response")) {
+                val phiResponse = jsonObject.getJSONObject("phi_response")
+                val cambios = mutableListOf<CambioNeutral>()
+
+                if (phiResponse.has("cambios")) {
+                    val cambiosArray = phiResponse.getJSONArray("cambios")
+                    Log.d(TAG, "Encontrados ${cambiosArray.length()} cambios en phi_response")
+
+                    for (i in 0 until cambiosArray.length()) {
+                        val cambio = cambiosArray.getJSONObject(i)
+                        val palabra = cambio.optString("palabra", "")
+                        val indiceInicio = cambio.optInt("indice_inicio", -1)
+                        val indiceFin = cambio.optInt("indice_fin", -1)
+
+                        if (palabra.isNotEmpty() && indiceInicio >= 0 && indiceFin > indiceInicio) {
+                            cambios.add(CambioNeutral(palabra, indiceInicio, indiceFin))
+                            Log.d(TAG, "Cambio: '$palabra' en [$indiceInicio-$indiceFin]")
+                        }
+                    }
+                }
+
+                cambiosNeutrales = cambios
+                Log.d(TAG, "Total de cambios procesados: ${cambiosNeutrales.size}")
+            }
+
             // Limpiar mapa de definiciones de BETO
             betoDefinitions.clear()
-
             val palabrasDetectadas = mutableListOf<String>()
 
-            // Procesar modismos detallados PRIMERO (prioridad)
+            // Procesar modismos detallados
             if (jsonObject.has("modismos_detallados")) {
                 val modismosArray = jsonObject.getJSONArray("modismos_detallados")
                 Log.d(TAG, "Encontrado modismos_detallados con ${modismosArray.length()} elementos")
@@ -205,15 +222,13 @@ class AnalysisActivity : AppCompatActivity() {
 
                     if (palabra.isNotEmpty()) {
                         palabrasDetectadas.add(palabra)
-                        // Guardar la definición que detectó BETO
                         betoDefinitions[palabra.lowercase()] = significadoDetectado
                         Log.d(TAG, "BETO detectó '$palabra': '$significadoDetectado'")
                     }
                 }
-
                 Log.d(TAG, "Palabras detectadas de modismos_detallados: $palabrasDetectadas")
             }
-            // Fallback: procesar modismos_detected si no hay detallados
+            // Fallback: procesar modismos_detected
             else if (jsonObject.has("modismos_detected")) {
                 val modismosObject = jsonObject.getJSONObject("modismos_detected")
                 Log.d(TAG, "Usando fallback: modismos_detected")
@@ -222,32 +237,26 @@ class AnalysisActivity : AppCompatActivity() {
                 while (keys.hasNext()) {
                     val palabra = keys.next()
                     val significado = modismosObject.getString(palabra)
-
                     if (palabra.isNotEmpty()) {
                         palabrasDetectadas.add(palabra)
-                        // Guardar la definición que detectó BETO
                         betoDefinitions[palabra.lowercase()] = significado
                         Log.d(TAG, "BETO detectó '$palabra': '$significado'")
                     }
                 }
-
                 Log.d(TAG, "Palabras detectadas de modismos_detected: $palabrasDetectadas")
             } else {
                 Log.w(TAG, "No se encontraron ni modismos_detallados ni modismos_detected")
             }
 
-            // Filtrar palabras que realmente aparecen en la frase
             val palabrasEnFrase = palabrasDetectadas
             Log.d(TAG, "Palabras filtradas presentes en la frase: $palabrasEnFrase")
 
-            // Cargar datos completos desde Firebase
+            // Cargar datos desde Firebase
             if (palabrasEnFrase.isNotEmpty()) {
                 loadModismosFromFirestore(palabrasEnFrase)
-
-                // Guardar palabras detectadas para el usuario
                 saveDetectedWordsToFirestore(palabrasEnFrase)
             } else {
-                Log.d(TAG, "No hay palabras presentes en la frase para cargar")
+                Log.d(TAG, "No hay palabras para cargar")
                 updateRecyclerViewWithModismos(emptyList())
             }
 
@@ -258,13 +267,6 @@ class AnalysisActivity : AppCompatActivity() {
         }
     }
 
-    private fun filterWordsInSentence(palabras: List<String>, sentence: String): List<String> {
-        val sentenceLower = sentence.lowercase()
-        return palabras.filter { palabra ->
-            sentenceLower.contains(palabra.lowercase())
-        }.distinct() // Evitar duplicados
-    }
-
     private fun loadModismosFromFirestore(palabras: List<String>) {
         if (palabras.isEmpty()) {
             Log.d(TAG, "No hay palabras para cargar desde Firebase")
@@ -273,7 +275,6 @@ class AnalysisActivity : AppCompatActivity() {
         }
 
         Log.d(TAG, "Cargando ${palabras.size} palabras desde Firebase: $palabras")
-
         val modismosFinales = mutableListOf<Modismo>()
         var loadedCount = 0
         val totalWords = palabras.size
@@ -286,13 +287,9 @@ class AnalysisActivity : AppCompatActivity() {
                 .addOnSuccessListener { documents ->
                     if (!documents.isEmpty) {
                         val doc = documents.documents[0]
-
                         Log.d(TAG, "Documento encontrado para '$palabra': ${doc.id}")
 
-                        // Obtener la definición que BETO detectó para esta palabra
                         val definicionBeto = betoDefinitions[palabra.lowercase()] ?: ""
-
-                        // Obtener sinónimos de Firebase
                         val sinonimos = doc.get("sinonimos") as? List<String> ?: emptyList()
                         val region = doc.getString("region") ?: "Colombia"
                         val tipo = doc.getString("tipo") ?: "Modismo"
@@ -300,17 +297,13 @@ class AnalysisActivity : AppCompatActivity() {
                         val modismo = Modismo(
                             palabra = palabra,
                             tipo = tipo,
-                            definiciones = listOf(definicionBeto), // Solo la definición de BETO
+                            definiciones = listOf(definicionBeto),
                             sinonimos = sinonimos
                         )
-
                         modismosFinales.add(modismo)
-
                         Log.d(TAG, "Modismo agregado: ${modismo.palabra} - Definición BETO: '$definicionBeto'")
                     } else {
                         Log.w(TAG, "No se encontró documento para la palabra: $palabra")
-
-                        // Si no está en Firebase, usar solo lo que detectó BETO
                         val definicionBeto = betoDefinitions[palabra.lowercase()] ?: ""
                         if (definicionBeto.isNotEmpty()) {
                             val modismo = Modismo(
@@ -327,20 +320,15 @@ class AnalysisActivity : AppCompatActivity() {
                     loadedCount++
                     Log.d(TAG, "Progreso de carga: $loadedCount/$totalWords")
 
-                    // Cuando se hayan cargado todas las palabras
                     if (loadedCount == totalWords) {
                         Log.d(TAG, "Carga completa. Total modismos: ${modismosFinales.size}")
                         detectedModismos = modismosFinales
                         updateRecyclerViewWithModismos(modismosFinales)
-
-                        // Actualizar el contenido con highlighting
                         updateContent()
                     }
                 }
                 .addOnFailureListener { e ->
                     Log.e(TAG, "Error cargando palabra '$palabra' desde Firebase", e)
-
-                    // Si hay error, usar solo lo que detectó BETO
                     val definicionBeto = betoDefinitions[palabra.lowercase()] ?: ""
                     if (definicionBeto.isNotEmpty()) {
                         val modismo = Modismo(
@@ -354,7 +342,6 @@ class AnalysisActivity : AppCompatActivity() {
                     }
 
                     loadedCount++
-
                     if (loadedCount == totalWords) {
                         Log.d(TAG, "Carga completa con errores. Total modismos: ${modismosFinales.size}")
                         detectedModismos = modismosFinales
@@ -371,7 +358,6 @@ class AnalysisActivity : AppCompatActivity() {
             Log.w(TAG, "Usuario no autenticado, no se guardarán las palabras")
             return
         }
-
         if (palabras.isEmpty()) {
             Log.d(TAG, "No hay palabras para guardar")
             return
@@ -380,18 +366,14 @@ class AnalysisActivity : AppCompatActivity() {
         val uid = currentUser.uid
         Log.d(TAG, "Guardando ${palabras.size} palabras para usuario: $uid")
 
-        // Capitalizar palabras
         val palabrasCapitalizadas = palabras.map { capitalizeFirstLetter(it) }
         val userDocRef = firestore.collection("usuarios").document(uid)
 
         firestore.runTransaction { transaction ->
             val snapshot = transaction.get(userDocRef)
-
             if (snapshot.exists()) {
-                // Usuario existe, agregar solo palabras nuevas
                 val currentPalabras = snapshot.get("palabras") as? List<String> ?: emptyList()
                 val palabrasExistentes = currentPalabras.map { it.lowercase() }.toSet()
-
                 val nuevasPalabras = palabrasCapitalizadas.filter { palabra ->
                     !palabrasExistentes.contains(palabra.lowercase())
                 }
@@ -400,10 +382,8 @@ class AnalysisActivity : AppCompatActivity() {
                     transaction.update(userDocRef, "palabras", FieldValue.arrayUnion(*nuevasPalabras.toTypedArray()))
                     Log.d(TAG, "Agregando ${nuevasPalabras.size} palabras nuevas: $nuevasPalabras")
                 }
-
                 nuevasPalabras.size
             } else {
-                // Usuario nuevo, crear documento
                 val userData = mapOf(
                     "uid" to uid,
                     "email" to (currentUser.email ?: ""),
@@ -431,7 +411,6 @@ class AnalysisActivity : AppCompatActivity() {
     }
 
     private fun processApiResponse() {
-        // Configurar audio si existe
         if (!audioPath.isNullOrEmpty()) {
             audioPlayerCard.isVisible = true
             setupAudioPlayer(audioPath!!)
@@ -439,7 +418,6 @@ class AnalysisActivity : AppCompatActivity() {
             audioPlayerCard.isVisible = false
         }
 
-        // Mostrar contenido inicial
         updateContent()
     }
 
@@ -472,7 +450,8 @@ class AnalysisActivity : AppCompatActivity() {
     private fun updateContent() {
         tvTextContent.animate().alpha(0.3f).setDuration(100).withEndAction {
             if (isNeutralSelected) {
-                tvTextContent.text = neutralizedSentence
+                // NUEVO: Mostrar frase neutral con highlighting de cambios
+                tvTextContent.text = highlightNeutralChanges(neutralizedSentence)
             } else {
                 tvTextContent.text = highlightDetectedWords(textContent)
             }
@@ -480,9 +459,49 @@ class AnalysisActivity : AppCompatActivity() {
         }.start()
     }
 
-    private fun highlightDetectedWords(text: String): SpannableString {
+    // NUEVO: Función para resaltar las palabras cambiadas en la frase neutral
+    private fun highlightNeutralChanges(text: String): SpannableString {
         val spannable = SpannableString(text)
 
+        if (cambiosNeutrales.isEmpty() || text.isBlank()) {
+            return spannable
+        }
+
+        val highlightColor = ContextCompat.getColor(this, R.color.highlight_word)
+
+        for (cambio in cambiosNeutrales) {
+            try {
+                // Validar que los índices estén dentro del rango
+                if (cambio.indiceInicio >= 0 && cambio.indiceFin <= text.length &&
+                    cambio.indiceInicio < cambio.indiceFin) {
+
+                    spannable.setSpan(
+                        ForegroundColorSpan(highlightColor),
+                        cambio.indiceInicio,
+                        cambio.indiceFin,
+                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                    )
+                    spannable.setSpan(
+                        android.text.style.StyleSpan(android.graphics.Typeface.BOLD),
+                        cambio.indiceInicio,
+                        cambio.indiceFin,
+                        Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                    )
+
+                    Log.d(TAG, "Resaltado: '${cambio.palabra}' en [${cambio.indiceInicio}-${cambio.indiceFin}]")
+                } else {
+                    Log.w(TAG, "Índices inválidos para '${cambio.palabra}': [${cambio.indiceInicio}-${cambio.indiceFin}], texto length: ${text.length}")
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Error resaltando '${cambio.palabra}'", e)
+            }
+        }
+
+        return spannable
+    }
+
+    private fun highlightDetectedWords(text: String): SpannableString {
+        val spannable = SpannableString(text)
         if (detectedModismos.isEmpty() || text.isBlank()) {
             return spannable
         }
@@ -494,59 +513,46 @@ class AnalysisActivity : AppCompatActivity() {
             val textLower = text.lowercase()
             val palabraLower = palabra.lowercase()
 
-            // Buscar coincidencias exactas primero
             var startIndex = 0
             while (startIndex < text.length) {
                 val index = textLower.indexOf(palabraLower, startIndex)
                 if (index == -1) break
 
                 val endIndex = index + palabra.length
-
                 spannable.setSpan(
                     ForegroundColorSpan(highlightColor),
                     index,
                     endIndex,
                     Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
                 )
-
                 spannable.setSpan(
                     android.text.style.StyleSpan(android.graphics.Typeface.BOLD),
                     index,
                     endIndex,
                     Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
                 )
-
                 startIndex = endIndex
             }
 
-            // Si no hubo coincidencias exactas, buscar palabras que comiencen con la raíz
             if (startIndex == 0) {
-                // Obtener raíz de la palabra (mínimo 4 caracteres para evitar falsos positivos)
                 val raiz = if (palabraLower.length > 4) {
                     palabraLower.substring(0, palabraLower.length - 2)
                 } else {
                     palabraLower
                 }
 
-                // Buscar palabras en el texto que comiencen con la raíz
                 val palabrasEnTexto = text.split(Regex("\\s+"))
                 var currentPosition = 0
-
                 for (palabraTexto in palabrasEnTexto) {
                     val palabraTextoLower = palabraTexto.lowercase()
-                        .replace(Regex("[^a-záéíóúñ]"), "") // Quitar puntuación
+                        .replace(Regex("[^a-záéíóúñ]"), "")
 
-                    // Verificar si la palabra comienza con la raíz
                     if (palabraTextoLower.startsWith(raiz) && palabraTextoLower.length >= raiz.length) {
-                        // Encontrar la posición exacta en el texto original
                         val posicionEnTexto = textLower.indexOf(palabraTextoLower, currentPosition)
-
                         if (posicionEnTexto != -1) {
-                            // Encontrar los límites exactos de la palabra (considerando puntuación)
                             var startWord = posicionEnTexto
                             var endWord = posicionEnTexto + palabraTextoLower.length
 
-                            // Ajustar para incluir la palabra completa sin puntuación
                             while (endWord < text.length && text[endWord].isLetter()) {
                                 endWord++
                             }
@@ -557,7 +563,6 @@ class AnalysisActivity : AppCompatActivity() {
                                 endWord,
                                 Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
                             )
-
                             spannable.setSpan(
                                 android.text.style.StyleSpan(android.graphics.Typeface.BOLD),
                                 startWord,
@@ -566,8 +571,6 @@ class AnalysisActivity : AppCompatActivity() {
                             )
                         }
                     }
-
-                    // Actualizar posición para la siguiente búsqueda
                     currentPosition = textLower.indexOf(palabraTexto.lowercase(), currentPosition) + palabraTexto.length
                 }
             }
@@ -578,11 +581,8 @@ class AnalysisActivity : AppCompatActivity() {
 
     private fun updateRecyclerViewWithModismos(modismos: List<Modismo>) {
         Log.d(TAG, "Actualizando RecyclerView con ${modismos.size} modismos")
-
         modismosAdapter = ModismosAdapter(modismos)
         recyclerViewModismos.adapter = modismosAdapter
-
-        // Hacer visible el RecyclerView
         recyclerViewModismos.isVisible = modismos.isNotEmpty()
 
         if (modismos.isNotEmpty()) {
@@ -604,11 +604,9 @@ class AnalysisActivity : AppCompatActivity() {
     private fun setupAudioPlayer(path: String) {
         try {
             releaseMediaPlayer()
-
             mediaPlayer = MediaPlayer().apply {
                 setDataSource(path)
                 prepare()
-
                 setOnCompletionListener {
                     btnPlayPause.setImageResource(R.drawable.ic_play)
                     seekBarAudio.progress = 0
@@ -616,7 +614,6 @@ class AnalysisActivity : AppCompatActivity() {
                     stopProgressUpdate()
                     this@AnalysisActivity.isPlaying = false
                 }
-
                 setOnPreparedListener {
                     val duration = duration
                     seekBarAudio.max = duration
@@ -624,12 +621,9 @@ class AnalysisActivity : AppCompatActivity() {
                     updateCurrentTime(0)
                 }
             }
-
             btnPlayPause.setImageResource(R.drawable.ic_play)
             isPlaying = false
-
             Log.d(TAG, "Reproductor configurado: $path")
-
         } catch (e: Exception) {
             Log.e(TAG, "Error configurando reproductor", e)
             audioPlayerCard.isVisible = false
@@ -702,9 +696,7 @@ class AnalysisActivity : AppCompatActivity() {
     private fun releaseMediaPlayer() {
         stopProgressUpdate()
         mediaPlayer?.apply {
-            if (isPlaying) {
-                stop()
-            }
+            if (isPlaying) stop()
             release()
         }
         mediaPlayer = null
@@ -713,9 +705,7 @@ class AnalysisActivity : AppCompatActivity() {
 
     override fun onPause() {
         super.onPause()
-        if (isPlaying) {
-            togglePlayPause()
-        }
+        if (isPlaying) togglePlayPause()
     }
 
     override fun onDestroy() {

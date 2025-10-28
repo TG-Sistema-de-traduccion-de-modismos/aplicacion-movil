@@ -1,3 +1,4 @@
+// 1. HomeFragment.kt - Agregar botón de ayuda
 package com.proyecto.modismos.fragments
 
 import android.content.Intent
@@ -6,8 +7,6 @@ import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.text.Editable
-import android.text.TextWatcher
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -55,6 +54,7 @@ class HomeFragment : Fragment() {
     private lateinit var tvTotalTime: TextView
     private lateinit var tvAudioName: TextView
     private lateinit var btnDictionary: MaterialButton
+    private lateinit var btnHelp: ImageView // NUEVO
     private lateinit var etTexto: EditText
     private lateinit var tvCharacterCount: TextView
     private lateinit var btnAnalizarTexto: MaterialButton
@@ -131,6 +131,7 @@ class HomeFragment : Fragment() {
         tvTotalTime = view.findViewById(R.id.tvTotalTime)
         tvAudioName = view.findViewById(R.id.tvAudioName)
         btnDictionary = view.findViewById(R.id.btnDiccionario)
+        btnHelp = view.findViewById(R.id.btnHelp) // NUEVO
         etTexto = view.findViewById(R.id.etTexto)
         tvCharacterCount = view.findViewById(R.id.tvCharacterCount)
         btnAnalizarTexto = view.findViewById(R.id.btnAnalizarTexto)
@@ -145,6 +146,11 @@ class HomeFragment : Fragment() {
                 mainActivity.findViewById<BottomNavigationView>(R.id.bottom_navigation)
                     .selectedItemId = R.id.nav_dictionary
             }
+        }
+
+        // NUEVO: Botón de ayuda
+        btnHelp.setOnClickListener {
+            showHelpDialog()
         }
 
         fabMicrophone.setOnClickListener { openAudioRecorder() }
@@ -166,6 +172,26 @@ class HomeFragment : Fragment() {
         })
     }
 
+    // NUEVO: Mostrar diálogo de ayuda
+    private fun showHelpDialog() {
+        val dialog = androidx.appcompat.app.AlertDialog.Builder(requireContext())
+            .setView(R.layout.dialog_help)
+            .setCancelable(true)
+            .create()
+
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+        dialog.show()
+
+        // Configurar botón de cerrar
+        dialog.findViewById<ImageView>(R.id.btnCloseHelp)?.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.findViewById<MaterialButton>(R.id.btnGotIt)?.setOnClickListener {
+            dialog.dismiss()
+        }
+    }
+
     private fun setupCharacterCounter() {
         etTexto.addTextChangedListener(object : android.text.TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
@@ -182,7 +208,6 @@ class HomeFragment : Fragment() {
     private fun updateCharacterCount(count: Int) {
         tvCharacterCount.text = "$count/$MAX_TEXT_LENGTH"
 
-        // Cambiar color si está cerca del límite o lo excede
         tvCharacterCount.setTextColor(
             when {
                 count > MAX_TEXT_LENGTH -> {
