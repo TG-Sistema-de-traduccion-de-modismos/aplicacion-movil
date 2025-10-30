@@ -41,6 +41,12 @@ class WordAdapter(private val modismos: List<Modismo>) :
                 putExtra("tipo", modismo.tipo)
                 putStringArrayListExtra("definiciones", ArrayList(modismo.definiciones))
                 putStringArrayListExtra("sinonimos", ArrayList(modismo.sinonimos))
+
+                // Pasar ejemplos como arrays separados
+                val ejemplosTextos = ArrayList(modismo.ejemplos.map { it.texto })
+                val ejemplosSignificados = ArrayList(modismo.ejemplos.map { it.significado })
+                putStringArrayListExtra("ejemplos_textos", ejemplosTextos)
+                putStringArrayListExtra("ejemplos_significados", ejemplosSignificados)
             }
             context.startActivity(intent)
         }

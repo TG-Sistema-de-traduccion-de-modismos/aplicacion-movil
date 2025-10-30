@@ -16,6 +16,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.proyecto.modismos.R
 import com.proyecto.modismos.adapters.AlphabetAdapter
 import com.proyecto.modismos.adapters.WordAdapter
+import com.proyecto.modismos.models.Ejemplo
 import com.proyecto.modismos.models.Modismo
 
 class DictionaryFragment : Fragment() {
@@ -179,11 +180,21 @@ class DictionaryFragment : Fragment() {
                         val significados = doc.get("significados") as? List<String> ?: emptyList()
                         val sinonimos = doc.get("sinonimos") as? List<String> ?: emptyList()
 
+                        // Obtener ejemplos del documento
+                        val ejemplosRaw = doc.get("ejemplos") as? List<HashMap<String, String>> ?: emptyList()
+                        val ejemplos = ejemplosRaw.map { map ->
+                            Ejemplo(
+                                texto = map["texto"] ?: "",
+                                significado = map["significado_asociado"] ?: ""
+                            )
+                        }
+
                         val modismo = Modismo(
                             palabra = wordName,
                             tipo = "Modismo",
                             definiciones = significados,
-                            sinonimos = sinonimos
+                            sinonimos = sinonimos,
+                            ejemplos = ejemplos
                         )
 
                         discoveredWords.add(modismo)

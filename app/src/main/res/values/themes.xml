@@ -11,9 +11,13 @@
         <item name="colorTertiary">@color/gray_light</item>
         <item name="colorOnTertiary">@color/white</item>
 
+
+
         <!-- Superficies -->
         <item name="colorSurface">@color/white</item>
         <item name="colorOnSurface">@color/text_black</item>
+        <item name="colorOnSurfaceVariant">#E2373737</item>
+
         <item name="colorOnBackground">@color/white</item>
 
         <!-- Status y Navigation bar -->

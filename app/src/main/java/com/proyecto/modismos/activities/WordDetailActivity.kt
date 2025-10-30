@@ -2,12 +2,14 @@ package com.proyecto.modismos.activities
 
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
 import com.google.android.flexbox.FlexboxLayout
+import com.google.android.material.card.MaterialCardView
 import com.proyecto.modismos.R
 
 class WordDetailActivity : AppCompatActivity() {
@@ -24,12 +26,21 @@ class WordDetailActivity : AppCompatActivity() {
         val tipo = intent.getStringExtra("tipo") ?: ""
         val definiciones = intent.getStringArrayListExtra("definiciones") ?: arrayListOf()
         val sinonimos = intent.getStringArrayListExtra("sinonimos") ?: arrayListOf()
+        val ejemplosTextos = intent.getStringArrayListExtra("ejemplos_textos") ?: arrayListOf()
+        val ejemplosSignificados = intent.getStringArrayListExtra("ejemplos_significados") ?: arrayListOf()
 
-        setupUI(palabra, tipo, definiciones, sinonimos)
+        setupUI(palabra, tipo, definiciones, sinonimos, ejemplosTextos, ejemplosSignificados)
         setupCloseButton()
     }
 
-    private fun setupUI(palabra: String, tipo: String, definiciones: List<String>, sinonimos: List<String>) {
+    private fun setupUI(
+        palabra: String,
+        tipo: String,
+        definiciones: List<String>,
+        sinonimos: List<String>,
+        ejemplosTextos: List<String>,
+        ejemplosSignificados: List<String>
+    ) {
         // Configurar título
         findViewById<TextView>(R.id.tv_word_title).text = palabra
         findViewById<TextView>(R.id.tv_word_type).text = tipo
@@ -47,6 +58,26 @@ class WordDetailActivity : AppCompatActivity() {
             definicionTextView.text = definicion
 
             definicionesContainer.addView(definicionView)
+        }
+
+        // Configurar ejemplos
+        if (ejemplosTextos.isNotEmpty() && ejemplosTextos.size == ejemplosSignificados.size) {
+            val cardEjemplos = findViewById<MaterialCardView>(R.id.card_ejemplos)
+            cardEjemplos.visibility = View.VISIBLE
+
+            val ejemplosContainer = findViewById<LinearLayout>(R.id.ejemplos_container)
+            ejemplosTextos.forEachIndexed { index, texto ->
+                val ejemploView = LayoutInflater.from(this)
+                    .inflate(R.layout.item_ejemplo, ejemplosContainer, false)
+
+                val textoTextView = ejemploView.findViewById<TextView>(R.id.tv_ejemplo_texto)
+                val significadoTextView = ejemploView.findViewById<TextView>(R.id.tv_ejemplo_significado)
+
+                textoTextView.text = texto
+                significadoTextView.text = ejemplosSignificados[index]
+
+                ejemplosContainer.addView(ejemploView)
+            }
         }
 
         // Configurar sinónimos con nuevo diseño
@@ -78,6 +109,4 @@ class WordDetailActivity : AppCompatActivity() {
             finish()
         }
     }
-
-
 }

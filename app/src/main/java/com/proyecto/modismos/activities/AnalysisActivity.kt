@@ -25,6 +25,7 @@ import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.proyecto.modismos.R
 import com.proyecto.modismos.adapters.ModismosAdapter
+import com.proyecto.modismos.models.Ejemplo
 import com.proyecto.modismos.models.Modismo
 import org.json.JSONObject
 import java.util.Locale
@@ -293,12 +294,20 @@ class AnalysisActivity : AppCompatActivity() {
                         val sinonimos = doc.get("sinonimos") as? List<String> ?: emptyList()
                         val region = doc.getString("region") ?: "Colombia"
                         val tipo = doc.getString("tipo") ?: "Modismo"
+                        val ejemplosRaw = doc.get("ejemplos") as? List<HashMap<String, String>> ?: emptyList()
+                        val ejemplos = ejemplosRaw.map { map ->
+                            Ejemplo(
+                                texto = map["texto"] ?: "",
+                                significado = map["significado_asociado"] ?: ""
+                            )
+                        }
 
                         val modismo = Modismo(
                             palabra = palabra,
                             tipo = tipo,
                             definiciones = listOf(definicionBeto),
-                            sinonimos = sinonimos
+                            sinonimos = sinonimos,
+                            ejemplos = ejemplos
                         )
                         modismosFinales.add(modismo)
                         Log.d(TAG, "Modismo agregado: ${modismo.palabra} - Definición BETO: '$definicionBeto'")
@@ -310,7 +319,8 @@ class AnalysisActivity : AppCompatActivity() {
                                 palabra = palabra,
                                 tipo = "Modismo",
                                 definiciones = listOf(definicionBeto),
-                                sinonimos = emptyList()
+                                sinonimos = emptyList(),
+                                ejemplos = emptyList()
                             )
                             modismosFinales.add(modismo)
                             Log.d(TAG, "Modismo agregado (sin Firebase): ${modismo.palabra}")
@@ -335,7 +345,8 @@ class AnalysisActivity : AppCompatActivity() {
                             palabra = palabra,
                             tipo = "Modismo",
                             definiciones = listOf(definicionBeto),
-                            sinonimos = emptyList()
+                            sinonimos = emptyList(),
+                            ejemplos = emptyList()
                         )
                         modismosFinales.add(modismo)
                         Log.d(TAG, "Modismo agregado (error Firebase): ${modismo.palabra}")

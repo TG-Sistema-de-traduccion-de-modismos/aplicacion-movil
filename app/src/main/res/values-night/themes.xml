@@ -13,6 +13,7 @@
         <!-- Superficies -->
         <item name="colorSurface">@color/black_secondary</item>
         <item name="colorOnSurface">@color/text_white</item>
+        <item name="colorOnSurfaceVariant">#E2DCDBDB</item>
         <item name="colorOnBackground">@color/black</item>
 
         <!-- Status y Navigation bar -->
