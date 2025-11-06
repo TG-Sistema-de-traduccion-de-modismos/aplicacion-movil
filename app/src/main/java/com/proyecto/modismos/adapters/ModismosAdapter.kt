@@ -52,7 +52,7 @@ class ModismosAdapter(
                 notifyItemChanged(adapterPosition)
             }
 
-            // ✅ Botón "Ver más" → ir a WordDetailActivity
+            // Botón "Ver más" → ir a WordDetailActivity
             btnInfo.setOnClickListener {
                 val context = itemView.context
                 val intent = Intent(context, WordDetailActivity::class.java).apply {
@@ -60,9 +60,19 @@ class ModismosAdapter(
                     putExtra("tipo", modismo.tipo)
                     putStringArrayListExtra("definiciones", ArrayList(modismo.definiciones))
                     putStringArrayListExtra("sinonimos", ArrayList(modismo.sinonimos))
+
+                    putStringArrayListExtra(
+                        "ejemplos_textos",
+                        ArrayList(modismo.ejemplos.map { it.texto })
+                    )
+                    putStringArrayListExtra(
+                        "ejemplos_significados",
+                        ArrayList(modismo.ejemplos.map { it.significado })
+                    )
                 }
                 context.startActivity(intent)
             }
+
         }
     }
 }

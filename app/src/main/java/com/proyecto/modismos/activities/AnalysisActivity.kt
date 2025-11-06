@@ -290,28 +290,55 @@ class AnalysisActivity : AppCompatActivity() {
                         val doc = documents.documents[0]
                         Log.d(TAG, "Documento encontrado para '$palabra': ${doc.id}")
 
-                        val definicionBeto = betoDefinitions[palabra.lowercase()] ?: ""
-                        val sinonimos = doc.get("sinonimos") as? List<String> ?: emptyList()
-                        val region = doc.getString("region") ?: "Colombia"
+                        var definicionBeto = betoDefinitions[palabra.lowercase()] ?: ""
+
+                        //  Nuevo manejo de casos especiales: si contiene "_", tomar solo la parte antes
+                        if (definicionBeto.contains("_")) {
+                            definicionBeto = definicionBeto.substringBefore("_")
+                            Log.d(TAG, "Definición BETO ajustada por '_' → '$definicionBeto'")
+                        }
+
                         val tipo = doc.getString("tipo") ?: "Modismo"
+
+                        val sinonimosRaw = doc.get("sinonimos") as? List<String> ?: emptyList()
+                        val sinonimosFiltrados = if (definicionBeto.isNotEmpty()) {
+                            sinonimosRaw.filterNot { sinonimo ->
+                                sinonimo.contains(definicionBeto, ignoreCase = true)
+                            }
+                        } else sinonimosRaw
+
                         val ejemplosRaw = doc.get("ejemplos") as? List<HashMap<String, String>> ?: emptyList()
-                        val ejemplos = ejemplosRaw.map { map ->
+                        val ejemplosMapeados = ejemplosRaw.map { map ->
                             Ejemplo(
                                 texto = map["texto"] ?: "",
                                 significado = map["significado_asociado"] ?: ""
                             )
                         }
 
+                        val ejemplosFiltrados = if (definicionBeto.isNotEmpty()) {
+                            ejemplosMapeados.filter { ejemplo ->
+                                ejemplo.significado.contains(definicionBeto, ignoreCase = true)
+                            }
+                        } else ejemplosMapeados
+
+                        val definicionesFirestore = doc.get("definiciones") as? List<String> ?: emptyList()
+                        val definicionesFinales = mutableListOf<String>().apply {
+                            if (definicionBeto.isNotEmpty()) add(definicionBeto)
+                            addAll(definicionesFirestore)
+                        }.distinct()
+
                         val modismo = Modismo(
                             palabra = palabra,
                             tipo = tipo,
-                            definiciones = listOf(definicionBeto),
-                            sinonimos = sinonimos,
-                            ejemplos = ejemplos
+                            definiciones = definicionesFinales,
+                            sinonimos = sinonimosFiltrados,
+                            ejemplos = ejemplosFiltrados
                         )
+
                         modismosFinales.add(modismo)
                         Log.d(TAG, "Modismo agregado: ${modismo.palabra} - Definición BETO: '$definicionBeto'")
-                    } else {
+                    }
+                    else {
                         Log.w(TAG, "No se encontró documento para la palabra: $palabra")
                         val definicionBeto = betoDefinitions[palabra.lowercase()] ?: ""
                         if (definicionBeto.isNotEmpty()) {
