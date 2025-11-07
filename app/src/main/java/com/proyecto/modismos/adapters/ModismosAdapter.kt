@@ -34,18 +34,12 @@ class ModismosAdapter(
     inner class ModismoViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val cardModismo: MaterialCardView = itemView.findViewById(R.id.cardModismo)
         private val tvPalabra: TextView = itemView.findViewById(R.id.tvPalabra)
-        private val ivExpandIcon: ImageView = itemView.findViewById(R.id.ivExpandIcon)
-        private val llExpandedContent: LinearLayout = itemView.findViewById(R.id.llExpandedContent)
         private val tvDefinicion: TextView = itemView.findViewById(R.id.tvDefinicion)
         private val btnInfo: MaterialButton = itemView.findViewById(R.id.btnInfo) // ✅ nuevo
 
         fun bind(modismo: Modismo) {
             tvPalabra.text = modismo.palabra
             tvDefinicion.text = modismo.definiciones[0]
-
-            // Expandir / colapsar
-            llExpandedContent.isVisible = modismo.isExpanded
-            ivExpandIcon.rotation = if (modismo.isExpanded) 180f else 0f
 
             cardModismo.setOnClickListener {
                 modismo.isExpanded = !modismo.isExpanded

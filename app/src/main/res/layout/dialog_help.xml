@@ -30,6 +30,7 @@
                     android:layout_width="48dp"
                     android:layout_height="48dp"
                     android:layout_centerVertical="true"
+                    android:contentDescription="TODO"
                     android:src="@drawable/ic_help"
                     android:padding="8dp"
                     android:background="@drawable/circle_accent_background"
@@ -181,7 +182,7 @@
                     <TextView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Toca el botón 'Grabar' y di tu frase (máximo 50 segundos). El audio se transcribirá automáticamente y se analizarán los modismos detectados."
+                        android:text="Toca el botón 'Grabar' y di tu frase (máximo 30 segundos). El audio se transcribirá automáticamente y se analizarán los modismos detectados."
                         android:textColor="?attr/colorOnSurface"
                         android:alpha="0.8"
                         android:textSize="14sp"
@@ -347,6 +348,52 @@
                         android:lineSpacingExtra="2dp" />
                 </LinearLayout>
             </LinearLayout>
+
+            <!-- NUEVO: Divider antes del disclaimer -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="?attr/colorOnSurface"
+                android:alpha="0.1"
+                android:layout_marginBottom="16dp" />
+
+            <!-- NUEVO: Disclaimer -->
+            <com.google.android.material.card.MaterialCardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="1dp"
+                app:strokeColor="?attr/colorPrimary"
+                android:backgroundTint="@android:color/transparent">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="16dp"
+                    android:gravity="start">
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_info"
+                        app:tint="?attr/colorPrimary"
+                        android:layout_marginEnd="12dp"
+                        android:layout_marginTop="2dp" />
+
+                    <TextView
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Las definiciones y significados han sido extraídos del Diccionario de la Real Academia Española (RAE) y del libro ´Bogotálogo´ de Andrés Ospina."
+                        android:textColor="?attr/colorOnSurface"
+                        android:alpha="0.75"
+                        android:textSize="12sp"
+                        android:lineSpacingExtra="2dp" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
 
             <!-- Botón Entendido -->
             <com.google.android.material.button.MaterialButton

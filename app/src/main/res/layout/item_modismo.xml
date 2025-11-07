@@ -4,105 +4,75 @@
     android:id="@+id/cardModismo"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginHorizontal="16dp"
-    android:layout_marginBottom="12dp"
     app:cardCornerRadius="16dp"
+    android:layout_marginBottom="10dp"
     app:cardElevation="2dp"
+    app:strokeWidth="1dp"
     app:cardBackgroundColor="?attr/colorOnBackground"
-    android:foreground="?attr/selectableItemBackground"
     android:clickable="true"
     android:focusable="true">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
+        android:orientation="horizontal"
         android:padding="16dp"
-        android:animateLayoutChanges="true">
+        android:gravity="center_vertical">
 
-        <!-- Encabezado -->
+        <!-- Contenido de texto -->
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:layout_marginEnd="12dp">
 
+            <!-- Palabra -->
             <TextView
                 android:id="@+id/tvPalabra"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:text="Bacano"
-                android:textColor="?attr/colorOnSurface"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                android:fontFamily="sans-serif-medium" />
-
-            <ImageView
-                android:id="@+id/ivExpandIcon"
-                android:layout_width="24dp"
-                android:layout_height="24dp"
-                android:src="@drawable/ic_expand"
-                app:tint="?attr/colorOnSurface"
-                android:rotation="0" />
-        </LinearLayout>
-
-        <!-- Chip región -->
-        <com.google.android.material.chip.Chip
-            android:id="@+id/chipRegion"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:text="🇨🇴 Bogotá"
-            android:textSize="12sp"
-            app:chipCornerRadius="8dp"
-            app:chipBackgroundColor="?attr/colorSurfaceVariant"
-            android:textColor="?attr/colorOnSurfaceVariant" />
-
-        <!-- Contenido expandible -->
-        <LinearLayout
-            android:id="@+id/llExpandedContent"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:visibility="gone"
-            android:layout_marginTop="12dp">
-
-            <!-- Definición -->
-            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Definición"
-                android:textColor="?attr/colorPrimary"
-                android:textSize="14sp"
+                android:text="Bacano"
+                android:textColor="?attr/colorOnSurface"
+                android:textSize="18sp"
                 android:textStyle="bold"
-                android:letterSpacing="0.05" />
+                android:fontFamily="sans-serif-medium"
+                android:letterSpacing="-0.01" />
 
+            <!-- Definición -->
             <TextView
                 android:id="@+id/tvDefinicion"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
                 android:text="Algo o alguien que es muy bueno, excelente o atractivo."
-                android:textColor="?attr/colorOnSurface"
-                android:textSize="15sp"
-                android:lineSpacingExtra="2dp" />
+                android:textColor="?attr/colorOnSurfaceVariant"
+                android:textSize="13sp"
+                android:lineSpacingMultiplier="1.25"
+                android:maxLines="2"
+                android:ellipsize="end" />
 
-
-            <!-- Botón de detalles -->
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnInfo"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="20dp"
-                android:text="Ver más detalles"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                app:icon="@drawable/ic_info"
-                app:iconGravity="start"
-                app:iconPadding="8dp"
-                style="@style/Widget.Material3.Button.OutlinedButton"
-                android:letterSpacing="0.02" />
         </LinearLayout>
+
+        <!-- Botón de detalles -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnInfo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Ver más"
+            android:textSize="12sp"
+            android:textAllCaps="false"
+            app:icon="@drawable/ic_info"
+            app:iconGravity="start"
+            app:iconPadding="4dp"
+            app:iconSize="16dp"
+            style="@style/Widget.Material3.Button.TonalButton"
+            android:letterSpacing="0"
+            app:cornerRadius="10dp"
+            android:paddingHorizontal="14dp"
+            android:paddingVertical="8dp"
+            android:minHeight="0dp"
+            android:minWidth="0dp" />
+
     </LinearLayout>
 </com.google.android.material.card.MaterialCardView>

@@ -35,7 +35,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:layout_marginTop="60dp"
+            android:layout_marginTop="80dp"
             android:layout_marginEnd="60dp">
 
             <TextView
@@ -55,30 +55,8 @@
                 android:textColor="?attr/colorOnPrimary"
                 android:alpha="0.9"
                 android:textSize="14sp"
-                android:layout_marginTop="4dp" />
+                android:layout_marginTop="8dp" />
         </LinearLayout>
-
-        <!-- Botón Diccionario -->
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnDiccionario"
-            android:layout_width="wrap_content"
-            android:layout_height="44dp"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentEnd="true"
-            android:text="Diccionario"
-            android:textColor="?attr/colorPrimary"
-            android:textSize="14sp"
-            android:textStyle="bold"
-            android:paddingStart="16dp"
-            android:paddingEnd="30dp"
-            app:cornerRadius="22dp"
-            app:icon="@drawable/ic_book"
-            app:iconTint="?attr/colorPrimary"
-            app:iconSize="18dp"
-            app:iconGravity="textStart"
-            app:iconPadding="8dp"
-            android:elevation="4dp"
-            app:backgroundTint="@color/white" />
     </RelativeLayout>
 
     <!-- Contenido -->
@@ -147,37 +125,63 @@
                     </LinearLayout>
 
                     <!-- Input con contador -->
-                    <com.google.android.material.textfield.TextInputLayout
+                    <FrameLayout
                         android:layout_width="match_parent"
-                        android:layout_height="160dp"
-                        android:hint="¿Qué quieres analizar?"
-                        app:boxBackgroundMode="outline"
-                        app:boxStrokeColor="?attr/colorPrimary"
-                        app:boxStrokeWidth="1dp"
-                        app:boxStrokeWidthFocused="2dp"
-                        app:boxCornerRadiusTopStart="12dp"
-                        app:boxCornerRadiusTopEnd="12dp"
-                        app:boxCornerRadiusBottomStart="12dp"
-                        app:boxCornerRadiusBottomEnd="12dp"
-                        app:counterEnabled="true"
-                        app:counterMaxLength="400"
-                        app:counterTextColor="?attr/colorOnSurface"
-                        app:counterOverflowTextColor="@color/red_primary">
+                        android:layout_height="160dp">
 
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/etTexto"
+                        <com.google.android.material.textfield.TextInputLayout
+                            android:id="@+id/textInputLayoutTexto"
+                            android:layout_marginTop="10dp"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
-                            android:gravity="top|start"
-                            android:inputType="textCapSentences|textMultiLine"
-                            android:maxLength="400"
-                            android:padding="16dp"
-                            android:textColor="?attr/colorOnSurface"
-                            android:textColorHint="?attr/colorPrimary"
-                            android:textSize="16sp"
-                            android:lineSpacingExtra="2dp"
-                            android:background="@android:color/transparent" />
-                    </com.google.android.material.textfield.TextInputLayout>
+                            android:hint="¿Qué quieres analizar?"
+                            app:boxBackgroundMode="outline"
+                            app:boxStrokeColor="?attr/colorPrimary"
+                            app:boxStrokeWidth="1dp"
+                            app:boxStrokeWidthFocused="2dp"
+                            app:boxCornerRadiusTopStart="12dp"
+                            app:boxCornerRadiusTopEnd="12dp"
+                            app:boxCornerRadiusBottomStart="12dp"
+                            app:boxCornerRadiusBottomEnd="12dp"
+                            app:counterEnabled="true"
+                            app:counterMaxLength="400"
+                            app:counterTextColor="?attr/colorOnSurface"
+                            app:counterOverflowTextColor="@color/red_primary">
+
+                            <com.google.android.material.textfield.TextInputEditText
+                                android:id="@+id/etTexto"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:gravity="top|start"
+                                android:inputType="textCapSentences|textMultiLine"
+                                android:maxLength="400"
+                                android:padding="16dp"
+                                android:paddingEnd="20dp"
+                                android:textColor="?attr/colorOnSurface"
+                                android:textColorHint="?attr/colorPrimary"
+                                android:textSize="16sp"
+                                android:lineSpacingExtra="2dp"
+                                android:background="@android:color/transparent"
+                                android:scrollbars="vertical"
+                                android:overScrollMode="always"
+                                android:scrollbarStyle="insideInset"
+                                android:fadeScrollbars="false" />
+                        </com.google.android.material.textfield.TextInputLayout>
+
+                        <!-- Botón X flotante superpuesto -->
+                        <ImageView
+                            android:id="@+id/btnClearText"
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:layout_gravity="top|end"
+                            android:src="@drawable/ic_close"
+                            android:background="?attr/selectableItemBackgroundBorderless"
+                            android:padding="6dp"
+                            app:tint="?attr/colorOnSurface"
+                            android:alpha="0.6"
+                            android:visibility="gone"
+                            android:contentDescription="Borrar texto" />
+                    </FrameLayout>
 
                     <com.google.android.material.button.MaterialButton
                         android:id="@+id/btnAnalizarTexto"

@@ -1,14 +1,17 @@
 // 1. HomeFragment.kt - Agregar botón de ayuda
 package com.proyecto.modismos.fragments
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.media.MediaPlayer
 import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.text.method.ScrollingMovementMethod
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
@@ -53,12 +56,12 @@ class HomeFragment : Fragment() {
     private lateinit var tvCurrentTime: TextView
     private lateinit var tvTotalTime: TextView
     private lateinit var tvAudioName: TextView
-    private lateinit var btnDictionary: MaterialButton
     private lateinit var btnHelp: ImageView // NUEVO
     private lateinit var etTexto: EditText
     private lateinit var tvCharacterCount: TextView
     private lateinit var btnAnalizarTexto: MaterialButton
     private lateinit var btnAnalizarAudio: MaterialButton
+    private lateinit var btnClearText: ImageView
 
     // Audio
     private var recordedAudioPath: String? = null
@@ -120,32 +123,47 @@ class HomeFragment : Fragment() {
         dialogManager = DialogManager(requireContext())
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     private fun initViews(view: View) {
         fabMicrophone = view.findViewById(R.id.fabMicrophone)
         fabUpload = view.findViewById(R.id.fabUpload)
         audioPlayerCard = view.findViewById(R.id.audioPlayerCard)
         btnPlayPause = view.findViewById(R.id.btnPlayPause)
         btnDelete = view.findViewById(R.id.btnDelete)
+        btnClearText = view.findViewById(R.id.btnClearText)
         seekBarAudio = view.findViewById(R.id.seekBarAudio)
         tvCurrentTime = view.findViewById(R.id.tvCurrentTime)
         tvTotalTime = view.findViewById(R.id.tvTotalTime)
         tvAudioName = view.findViewById(R.id.tvAudioName)
-        btnDictionary = view.findViewById(R.id.btnDiccionario)
         btnHelp = view.findViewById(R.id.btnHelp) // NUEVO
         etTexto = view.findViewById(R.id.etTexto)
         tvCharacterCount = view.findViewById(R.id.tvCharacterCount)
         btnAnalizarTexto = view.findViewById(R.id.btnAnalizarTexto)
         btnAnalizarAudio = view.findViewById(R.id.btnAnalizarAudio)
 
+        etTexto.setOnTouchListener { v, event ->
+            if (v.id == R.id.etTexto) {
+                v.parent.requestDisallowInterceptTouchEvent(true)
+                when (event.action and MotionEvent.ACTION_MASK) {
+                    MotionEvent.ACTION_UP -> {
+                        v.parent.requestDisallowInterceptTouchEvent(false)
+                        v.performClick()
+                    }
+                }
+            }
+            false
+        }
+
+        etTexto.movementMethod = ScrollingMovementMethod()
+        etTexto.isVerticalScrollBarEnabled = true
+
         setupCharacterCounter()
     }
 
     private fun setupClickListeners() {
-        btnDictionary.setOnClickListener {
-            (activity as? UserMainActivity)?.let { mainActivity ->
-                mainActivity.findViewById<BottomNavigationView>(R.id.bottom_navigation)
-                    .selectedItemId = R.id.nav_dictionary
-            }
+
+        btnClearText.setOnClickListener {
+            etTexto.text?.clear()
         }
 
         // NUEVO: Botón de ayuda
@@ -199,6 +217,8 @@ class HomeFragment : Fragment() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 val currentLength = s?.length ?: 0
                 updateCharacterCount(currentLength)
+
+                btnClearText.isVisible = currentLength > 0
             }
 
             override fun afterTextChanged(s: android.text.Editable?) {}
